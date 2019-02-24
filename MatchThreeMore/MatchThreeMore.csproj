@@ -1,0 +1,250 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <PropertyGroup>
+    <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
+    <Platform Condition=" '$(Platform)' == '' ">iPhoneSimulator</Platform>
+    <ProjectGuid>{B864E4D3-F2CC-4819-A03E-53DD471D2DFC}</ProjectGuid>
+    <ProjectTypeGuids>{FEACFBD2-3405-455C-9665-78FE426C6842};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
+    <OutputType>Exe</OutputType>
+    <RootNamespace>MatchThreeMore</RootNamespace>
+    <AssemblyName>MatchThreeMore</AssemblyName>
+    <IPhoneResourcePrefix>Resources</IPhoneResourcePrefix>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhoneSimulator' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Debug</OutputPath>
+    <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchFastDev>true</MtouchFastDev>
+    <IOSDebuggerPort>14987</IOSDebuggerPort>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>i386, x86_64</MtouchArch>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <PlatformTarget>x86</PlatformTarget>
+    <OnDemandResourcesInitialInstallTags>sprites</OnDemandResourcesInitialInstallTags>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhone\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchUseLlvm>true</MtouchUseLlvm>
+    <MtouchFloat32>true</MtouchFloat32>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchArch>ARMv7</MtouchArch>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <PlatformTarget>x86</PlatformTarget>
+<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
+    <DebugType>pdbonly</DebugType>
+    <Optimize>true</Optimize>
+    <OutputPath>bin\iPhoneSimulator\Release</OutputPath>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer</CodesignKey>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchLink>None</MtouchLink>
+    <MtouchArch>x86_64</MtouchArch>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <PlatformTarget>x86</PlatformTarget>
+  </PropertyGroup>
+  <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
+    <DebugSymbols>true</DebugSymbols>
+    <DebugType>full</DebugType>
+    <Optimize>false</Optimize>
+    <OutputPath>bin\iPhone\Debug</OutputPath>
+    <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
+    <ErrorReport>prompt</ErrorReport>
+    <WarningLevel>4</WarningLevel>
+    <CodesignKey>iPhone Developer: artem.koloskov@gmail.com (4STTM4HRN3)</CodesignKey>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <MtouchDebug>true</MtouchDebug>
+    <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+    <MtouchFastDev>true</MtouchFastDev>
+    <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
+    <IOSDebuggerPort>18229</IOSDebuggerPort>
+    <MtouchLink>SdkOnly</MtouchLink>
+    <MtouchArch>ARMv7s, ARM64</MtouchArch>
+    <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
+    <PlatformTarget>x86</PlatformTarget>
+    <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.calculator</CodesignProvision>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <OnDemandResourcesInitialInstallTags>sprites</OnDemandResourcesInitialInstallTags>
+<MtouchFloat32>true</MtouchFloat32>
+</PropertyGroup>
+  <ItemGroup>
+    <Reference Include="System" />
+    <Reference Include="System.Xml" />
+    <Reference Include="System.Core" />
+    <Reference Include="Xamarin.iOS" />
+    <Reference Include="Newtonsoft.Json">
+      <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\netstandard2.0\Newtonsoft.Json.dll</HintPath>
+    </Reference>
+  </ItemGroup>
+  <ItemGroup>
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Spaceship.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\Spaceship.imageset\Spaceship.png" />
+    <ImageAsset Include="Assets.xcassets\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\LaunchImage.launchimage\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\bomb.imageset\bomb.png" />
+    <ImageAsset Include="Assets.xcassets\bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\bomb_selected.imageset\bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond.imageset\diamond.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal.imageset\diamond_horizontal.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal_selected.imageset\diamond_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_selected.imageset\diamond_selected.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical.imageset\diamond_vertical.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical_selected.imageset\diamond_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon.imageset\hexagon.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal.imageset\hexagon_horizontal.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal_selected.imageset\hexagon_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_selected.imageset\hexagon_selected.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical.imageset\hexagon_vertical.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical_selected.imageset\hexagon_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon.imageset\pentagon.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal.imageset\pentagon_horizontal.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal_selected.imageset\pentagon_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_selected.imageset\pentagon_selected.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical.imageset\pentagon_vertical.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical_selected.imageset\pentagon_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\square.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square.imageset\square.png" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal.imageset\square_horizontal.png" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal_selected.imageset\square_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\square_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_selected.imageset\square_selected.png" />
+    <ImageAsset Include="Assets.xcassets\square_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_vertical.imageset\square_vertical.png" />
+    <ImageAsset Include="Assets.xcassets\square_vertical_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_vertical_selected.imageset\square_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\triangle.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle.imageset\triangle.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal.imageset\triangle_horizontal.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal_selected.imageset\triangle_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_selected.imageset\triangle_selected.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical.imageset\triangle_vertical.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical_selected.imageset\triangle_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\destroyer_ray_horisontal.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\diamond_vertical_selected.png" />
+    <ImageAsset Include="Assets.xcassets\destroyer_ray_horisontal.imageset\diamond_horizontal_selected.png" />
+  </ItemGroup>
+  <ItemGroup>
+    <Folder Include="Resources\" />
+    <Folder Include="Assets.xcassets\bomb.imageset\" />
+    <Folder Include="Assets.xcassets\bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\diamond.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_horizontal.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_horizontal_selected.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_selected.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_vertical_selected.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_horizontal.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_horizontal_selected.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_selected.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_vertical_selected.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_horizontal.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_horizontal_selected.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_selected.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_vertical_selected.imageset\" />
+    <Folder Include="Assets.xcassets\square.imageset\" />
+    <Folder Include="Assets.xcassets\square_horizontal.imageset\" />
+    <Folder Include="Assets.xcassets\square_horizontal_selected.imageset\" />
+    <Folder Include="Assets.xcassets\square_selected.imageset\" />
+    <Folder Include="Assets.xcassets\square_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\square_vertical_selected.imageset\" />
+    <Folder Include="Assets.xcassets\triangle.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_horizontal.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_horizontal_selected.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_selected.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_vertical_selected.imageset\" />
+    <Folder Include="Levels\" />
+    <Folder Include="Assets.xcassets\destroyer_ray_horisontal.imageset\" />
+    <Folder Include="Assets.xcassets\destroyer_ray_vertical.imageset\" />
+  </ItemGroup>
+  <ItemGroup>
+    <BundleResource Include="GameScene.sks" />
+    <BundleResource Include="Resources\ding.wav" />
+    <BundleResource Include="Resources\error.wav" />
+    <BundleResource Include="Resources\swap.wav" />
+    <BundleResource Include="Resources\background.jpg" />
+    <BundleResource Include="Dev_Level_1.json" />
+    <BundleResource Include="Dev_Level_2.json" />
+    <BundleResource Include="Resources\destroyer.mp3" />
+    <BundleResource Include="Resources\destroyer.wav" />
+    <BundleResource Include="Resources\new_destroyer.wav" />
+  </ItemGroup>
+  <ItemGroup>
+    <InterfaceDefinition Include="LaunchScreen.storyboard" />
+    <InterfaceDefinition Include="Main.storyboard" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Info.plist" />
+    <None Include="Entitlements.plist" />
+    <None Include="packages.config" />
+  </ItemGroup>
+  <ItemGroup>
+    <Compile Include="Main.cs" />
+    <Compile Include="AppDelegate.cs" />
+    <Compile Include="GameViewController.cs" />
+    <Compile Include="GameViewController.designer.cs">
+      <DependentUpon>GameViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GameScene.cs" />
+    <Compile Include="Gem.cs" />
+    <Compile Include="Properties.cs" />
+    <Compile Include="Level.cs" />
+    <Compile Include="Swap.cs" />
+    <Compile Include="MainMenuViewController.cs" />
+    <Compile Include="MainMenuViewController.designer.cs">
+      <DependentUpon>MainMenuViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="GemList.cs" />
+    <Compile Include="GameOverViewController.cs" />
+    <Compile Include="GameOverViewController.designer.cs">
+      <DependentUpon>GameOverViewController.cs</DependentUpon>
+    </Compile>
+    <Compile Include="LevelData.cs" />
+  </ItemGroup>
+  <Import Project="$(MSBuildExtensionsPath)\Xamarin\iOS\Xamarin.iOS.CSharp.targets" />
+</Project>
