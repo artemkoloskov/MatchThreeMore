@@ -11,13 +11,19 @@ namespace MatchThreeMore
 {
     public partial class GameViewController : UIViewController
     {
-        public bool devModeIsOn;
-        public Level level;
-        public GameScene scene;
+        public bool DevModeIsOn { get; set; }
+
+        private Level level;
+        private GameScene scene;
+
         private NSTimer gameTimer;
         private int currentTime = Properties.LevelTime;
+
         private int highScore;
-        private bool hadDestroyer;
+        private string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
+
+        private bool chainsHadDestroyer;
+
         private UILabel timerLabel;
         private UILabel scoreLabel;
         private UILabel highScoreLabel;
@@ -35,6 +41,7 @@ namespace MatchThreeMore
             SKView skView = (SKView)View;
             skView.ShowsFPS = true;
             skView.ShowsNodeCount = true;
+
             /* Sprite Kit applies additional optimizations to improve rendering performance */
             skView.IgnoresSiblingOrder = true;
 
@@ -46,8 +53,10 @@ namespace MatchThreeMore
             scene.SetSize(skView.Bounds.Size);
 
             // Создаем игровой уровень, передаем его сцене
-            level = new Level(devModeIsOn);
+            level = new Level(DevModeIsOn);
+
             scene.Level = level;
+
             // инциализируем делегат обработки обмена местами камешков
             scene.SwipeHandler = HandleSwipeAsync;
 
@@ -60,69 +69,51 @@ namespace MatchThreeMore
 
             StopButton.SetTitle("В МЕНЮ", UIControlState.Normal);
 
-            skView.Add(StopButton);
-
             StopButton.TouchUpInside += (sender, e) => {
                 gameTimer.Invalidate();
                 UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
                 NavigationController.PushViewController(mainMenu, true);
             };
 
-            var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-            var filename = Path.Combine(documents, "High_scores.txt");
+            // получаем лучший счет
+            highScore = GetSetHighScore();
 
-            string highScoreText = "";
-
-            try
-            {
-                highScoreText = File.ReadAllText(filename);
-            }
-            catch (Exception e)
-            {
-                Console.Write("File " + filename + " not found. \n" + e);
-            }
-
-            string[] line = highScoreText.Split(',');
-
-            if (line.GetLength(0) != 1)
-            {
-                highScore = Convert.ToInt32(line[1]);
-            }
-            else
-            {
-                highScore = 0;
-            }
-
+            // лэйбл с лучшим счетом
             highScoreLabel = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 50, 150, 50),
                 TextAlignment = UITextAlignment.Center,
-                Text = "Лучший счет:" + highScore
+                Text = "Лучший счет: " + highScore
             };
 
-            skView.Add(highScoreLabel);
-
+            // лэйбл с таймером
             timerLabel = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 75, 150, 50),
                 TextAlignment = UITextAlignment.Center
             };
-            skView.Add(timerLabel);
 
+            // лэйбл с надписью Счет
             UILabel scoreTitle = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 90, 150, 50),
                 TextAlignment = UITextAlignment.Center,
                 Text = "Счёт:"
             };
-            skView.Add(scoreTitle);
 
+            // лэйбл со счетом
             scoreLabel = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 105, 150, 50),
                 TextAlignment = UITextAlignment.Center,
                 Text = "0"
             };
+
+            // добавляем элементы интерфейса на вью
+            skView.Add(StopButton);
+            skView.Add(highScoreLabel);
+            skView.Add(timerLabel);
+            skView.Add(scoreTitle);
             skView.Add(scoreLabel);
 
             // Present the scene.
@@ -130,6 +121,41 @@ namespace MatchThreeMore
 
             // Начало игры
             BeginGame();
+        }
+
+        /// <summary>
+        /// Загружает из файла предыдущий лучший счет
+        /// </summary>
+        private int GetSetHighScore()
+        {
+            // счет для режима разработчика
+            if (DevModeIsOn)
+            {
+                return 300;
+            }
+
+            string highScoreText = "";
+
+            // загрузка из файла
+            try
+            {
+                highScoreText = File.ReadAllText(highScoresFileName);
+            }
+            catch (Exception e)
+            {
+                Console.Write("File " + highScoresFileName + " not found. \n" + e);
+            }
+
+            // парсим счет из строки загруженрной из файла
+            string[] line = highScoreText.Split(',');
+
+            if (line.GetLength(0) != 1)
+            {
+                return Convert.ToInt32(line[1]);
+            }
+
+            // лучший счет 0 если нет лучшего счета
+            return 0;
         }
 
         public override bool ShouldAutorotate()
@@ -161,26 +187,36 @@ namespace MatchThreeMore
         /// </summary>
         private void BeginGame()
         {
-            Shuffle();
+            // перемешиваем камешки в модели и заполняем спрайтами сцену
+            ShuffleGems();
+
+            // запуск таймера
             gameTimer = NSTimer.CreateRepeatingScheduledTimer(TimeSpan.FromSeconds(1.0), delegate
             {
+                // когда таймер дойдет до 0
                 if (TimerAction() == 0)
                 {
+                    // деактивировать таймер
                     gameTimer.Invalidate();
 
-                    var documents = Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments);
-                    var filename = Path.Combine(documents, "High_scores.txt");
+                    // Записать в файл новый лучший счет
                     int newHighScore = Math.Max(highScore, Convert.ToInt32(scoreLabel.Text));
+                    File.WriteAllText(highScoresFileName, "score, " + newHighScore);
 
-                    File.WriteAllText(filename, "score, " + newHighScore);
-
+                    // перейти к экрану конца игры
                     GameOverViewController gameOver = Storyboard.InstantiateViewController("GameOver") as GameOverViewController;
+
+                    // Передаем счет игры экрану конца игры
                     gameOver.score.Text = scoreLabel.Text;
                     NavigationController.PushViewController(gameOver, true);
                 }
             });
         }
 
+        /// <summary>
+        /// Поведение таймера.
+        /// </summary>
+        /// <returns>Текущее время таймера.</returns>
         private int TimerAction ()
         {
             currentTime--;
@@ -215,8 +251,10 @@ namespace MatchThreeMore
             return currentTime;
         }
 
-        // Перемешать камешки, добавив спрайты камешков на сцену
-        private void Shuffle()
+        /// <summary>
+        /// Перемешать камешки, добавив спрайты камешков на сцену
+        /// </summary>
+        private void ShuffleGems()
         {
             level.Shuffle();
             scene.AttachSpritesTo(level.GemArray);
@@ -228,7 +266,6 @@ namespace MatchThreeMore
         /// на валидность, если обмен валидный включает интерактивность обратно,
         /// если обмен не валидный - возвращает массив в исходное состояние, проигрывает
         /// анимацию возвращения камешков на исходные позиции
-        /// 
         /// </summary>
         /// <param name="swap">Объект с камешками для обмена.</param>
         public async void HandleSwipeAsync(Swap swap)
@@ -243,22 +280,22 @@ namespace MatchThreeMore
                 // проводим обмен в модели
                 level.Perform(swap);
 
-                // анимируем обмен
+                // анимируем обмен на сцене
                 scene.Animate(swap, swapIsValid);
-
-                // 
                 await Task.Delay(Properties.SwapAnimationDuration);
 
+                // обрабатываем полученные цепочки
                 await HandleChains();
 
+                // задержка, нужная для всех анимаций перед тем,как включать интерактивность
                 int delay = Properties.DestructionAnimationDuration + Properties.FallAnimationDuration;
 
-                if (hadDestroyer)
+                // если был разрушитель - увеличиваем время задержки
+                if (chainsHadDestroyer)
                 {
                     delay += Properties.LineDestructionDuration;
+                    chainsHadDestroyer = false;
                 }
-
-                hadDestroyer = false;
 
                 await Task.Delay(delay);
 
@@ -285,13 +322,10 @@ namespace MatchThreeMore
             // и спуска камешков
             while (level.RetriveChain() != null)
             {
-                // Костыль, модель выполняет удаление цепочек, одновременно проверяет на наличие
-                // активируемых бонусов и заменяет цепочки с ними на цепочки из всего ряда
-                // или колонки, в котором был активированный бонус. Возвращает true, если был хоть
-                // один бонус, сигнализируя, чтов lebel.bonuses есть активированные бонусы, которые
-                // нужно обработать.
+                // уничтожаем цепочки
                 level.DestroyChains();
 
+                // если при уничтожении были найдены бонусы - анимируем сцену особым образом
                 if (level.BonusesToAnimate.Count > 0)
                 {
                     // Цикл проходит по всем бонусам, анимирует их и анимирует удаление найденных цепочек
@@ -299,7 +333,7 @@ namespace MatchThreeMore
                     {
                         if (gem.IsALineDestroyer)
                         {
-                            hadDestroyer = true;
+                            chainsHadDestroyer = true;
 
                             scene.AnimateLineDestroyer(gem);
 
@@ -330,9 +364,9 @@ namespace MatchThreeMore
 
             }
 
-            // обновлем лэйбл с счетом
+            // обновлем лэйблы с счетом
             scoreLabel.Text = level.Score.ToString();
-            highScoreLabel.Text = Math.Max(level.Score, Convert.ToInt32(highScoreLabel.Text)) + "";
+            highScoreLabel.Text = "Лучший счет: " + Math.Max(level.Score, highScore) + "";
 
             // вызываем метод заполнения пустот в модели, создаем для них спрайты
             scene.AttachSpritesTo(level.FillBlanks());
@@ -340,10 +374,11 @@ namespace MatchThreeMore
             // создаем спрайты для новых бонусов
             scene.AttachSpritesTo(level.BonusesToAddSpritesTo);
 
-            level.DetectPossibleSwaps();
-
             // очищаем списки обработанных бонусов
             level.BonusesToAddSpritesTo.Clear();
+
+            // загружаем список доступных обменов
+            level.DetectPossibleSwaps();
         }
     }
 }

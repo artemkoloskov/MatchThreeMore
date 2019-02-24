@@ -41,7 +41,7 @@ namespace MatchThreeMore
 
             startInDevModeButton.TouchUpInside += (sender, e) => {
                 GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
-                gameView.devModeIsOn = true;
+                gameView.DevModeIsOn = true;
                 NavigationController.PushViewController(gameView, true);
             };
         }
