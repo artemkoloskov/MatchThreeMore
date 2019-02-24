@@ -198,7 +198,6 @@
     <Folder Include="Assets.xcassets\triangle_selected.imageset\" />
     <Folder Include="Assets.xcassets\triangle_vertical.imageset\" />
     <Folder Include="Assets.xcassets\triangle_vertical_selected.imageset\" />
-    <Folder Include="Levels\" />
     <Folder Include="Assets.xcassets\destroyer_ray_horisontal.imageset\" />
     <Folder Include="Assets.xcassets\destroyer_ray_vertical.imageset\" />
   </ItemGroup>
@@ -210,7 +209,6 @@
     <BundleResource Include="Resources\background.jpg" />
     <BundleResource Include="Dev_Level_1.json" />
     <BundleResource Include="Dev_Level_2.json" />
-    <BundleResource Include="Resources\destroyer.mp3" />
     <BundleResource Include="Resources\destroyer.wav" />
     <BundleResource Include="Resources\new_destroyer.wav" />
   </ItemGroup>
