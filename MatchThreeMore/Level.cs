@@ -198,18 +198,28 @@ namespace MatchThreeMore
             // проверяем получившюся цепоку на длину. если цепочка больше трех на
             // месте премещенного камешка ставим бонус
             // записываем бонус в список на добавление спрайтов для сцены
-            if (chain.Count >= 4)
+            if (chain.Count == 4)
             {
                 bool isHorizontal = chain.ToArray()[0].Row == chain.ToArray()[1].Row;
                 BonusesToAddSpritesTo.Add(new Gem(true, isHorizontal, GemArray[rowB, columnB].GemType, rowB, columnB));
             }
 
+            if (chain.Count >= 5)
+            {
+                BonusesToAddSpritesTo.Add(new Gem(true, GemArray[rowB, columnB].GemType, rowB, columnB));
+            }
+
             chain = GetChainAt(rowA, columnA);
 
-            if (chain.Count >= 4)
+            if (chain.Count == 4)
             {
                 bool isHorizontal = chain.ToArray()[0].Row == chain.ToArray()[1].Row;
                 BonusesToAddSpritesTo.Add(new Gem(true, isHorizontal, GemArray[rowA, columnA].GemType, rowA, columnA));
+            }
+
+            if (chain.Count >= 5)
+            {
+                BonusesToAddSpritesTo.Add(new Gem(true, GemArray[rowA, columnA].GemType, rowA, columnA));
             }
         }
 

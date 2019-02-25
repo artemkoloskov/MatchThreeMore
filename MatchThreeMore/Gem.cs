@@ -27,6 +27,7 @@ namespace MatchThreeMore
         public SKSpriteNode Sprite { get; set; }
         public bool IsALineDestroyer { get; set; }
         public bool IsHorizontal { get; set; }
+        public bool IsABomb { get; set; }
 
         /// <summary>
         /// Конструктор создания камешка определенного типа в определенной позиции
@@ -67,6 +68,20 @@ namespace MatchThreeMore
             IsHorizontal = isHorizontal;
             Row = row;
             Column = column;
+        }
+
+        /// <summary>
+        /// Инициализация разрушителя линии
+        /// </summary>
+        /// <param name="gemType">Gem type.</param>
+        /// <param name="row">Row.</param>
+        /// <param name="column">Column.</param>
+        public Gem(bool isABomb, GemType gemType, int row, int column)
+        {
+            GemType = gemType;
+            Row = row;
+            Column = column;
+            IsABomb = isABomb;
         }
 
         /// <summary>
@@ -121,6 +136,11 @@ namespace MatchThreeMore
                 {
                     str.Append("; верт. разр.");
                 }
+
+            if (IsABomb)
+            {
+                str.Append("; бомба");
+            }
 
             return str.ToString();
         }

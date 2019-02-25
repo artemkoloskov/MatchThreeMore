@@ -156,9 +156,10 @@ namespace MatchThreeMore
             SKSpriteNode sprite;
 
             // Если разрушитель - открепляем старый спрайт на этом месте от слоя камешков
-            if (gem.IsALineDestroyer && Level.GemArray[gem.Row, gem.Column] != null)
+            if ((gem.IsALineDestroyer || gem.IsABomb) && Level.GemArray[gem.Row, gem.Column] != null)
             {
                 sprite = Level.GemArray[gem.Row, gem.Column].Sprite;
+
                 if (sprite != null && sprite.Parent != null)
                 {
                     sprite.RemoveFromParent();
@@ -190,7 +191,7 @@ namespace MatchThreeMore
             ));
 
             // если разрушитель - заменяем в массиве камешек
-            if (gem.IsALineDestroyer)
+            if (gem.IsALineDestroyer || gem.IsABomb)
             {
                 Level.GemArray[gem.Row, gem.Column] = gem;
             }
