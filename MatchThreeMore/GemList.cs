@@ -10,11 +10,11 @@ namespace MatchThreeMore
         /// Проверяет цепочку на наличие в ней бонуса, возвращает бонус.
         /// </summary>
         /// <returns>The for destroyers in list.</returns>
-        public Gem GetDestroyer()
+        public Gem GetBonus()
         {
             foreach (Gem gem in this)
             {
-                if (gem.IsALineDestroyer)
+                if (gem.IsALineDestroyer || gem.IsABomb)
                 { 
                     return gem;
                 }
@@ -23,9 +23,9 @@ namespace MatchThreeMore
             return null;
         }
 
-        public bool HasDestroyer()
+        public bool HasBonus()
         {
-            return GetDestroyer() != null;
+            return GetBonus() != null;
         }
     }
 }

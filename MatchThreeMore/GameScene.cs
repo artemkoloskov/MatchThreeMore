@@ -345,7 +345,7 @@ namespace MatchThreeMore
         {
             // маркер проверки на наличие в разрушенных цепочках разрушителя
             // если был разрушитель - звук разрушения будет другой
-            bool hadDestroyers = false;
+            bool hadBonuses = false;
 
             if (chains == null)
             {
@@ -360,11 +360,11 @@ namespace MatchThreeMore
                     SKAction sprtieAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
                     sprite.RunAction(SKAction.Sequence(sprtieAction, SKAction.RemoveFromParent()));
 
-                    hadDestroyers |= gem.IsALineDestroyer;
+                    hadBonuses |= gem.IsABomb || gem.IsALineDestroyer;
                 }
             }
 
-            if (hadDestroyers)
+            if (hadBonuses)
             {
                 RunAction(destroySound);
             }
@@ -474,6 +474,28 @@ namespace MatchThreeMore
             gemLayer.AddChild(sprite);
 
             sprite.RunAction(moveToCenter);
+            sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
+        }
+
+        /// <summary>
+        /// Анимация бонуса Бомба
+        /// </summary>
+        /// <param name="bomb">Бомба.</param>
+        public void AnimateBomb(Gem bomb)
+        {
+            CGSize initialSize = new CGSize(gemCellWidth, gemCellHeight);
+            CGSize newSize = new CGSize(gemCellWidth * (Properties.BombBlastRadius * 2 + 1), gemCellHeight * (Properties.BombBlastRadius * 2 + 1));
+            CGPoint initialPosition = GetPositionFromRowAndColumn(bomb.Row, bomb.Column);
+
+            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("bomb_blast");
+            sprite.Size = initialSize;
+            sprite.Position = initialPosition;
+            sprite.ZPosition = 110;
+
+            SKAction resizeSprite = SKAction.ResizeTo(newSize, Properties.LineDestructionDuration / 1000f);
+
+            gemLayer.AddChild(sprite);
+
             sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
         }
 

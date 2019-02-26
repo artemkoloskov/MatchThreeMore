@@ -163,6 +163,28 @@
     <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\diamond_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\destroyer_ray_horisontal.imageset\diamond_horizontal_selected.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\square_bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb_selected.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb.imageset\triangle_bomb.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb_selected.imageset\triangle_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\square_bomb.imageset\square_bomb.png" />
+    <ImageAsset Include="Assets.xcassets\square_bomb_selected.imageset\square_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb.imageset\diamond_bomb.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb_selected.imageset\diamond_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb.imageset\pentagon_bomb.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb_selected.imageset\pentagon_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb.imageset\hexagon_bomb.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb_selected.imageset\hexagon_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\bomb_blast.imageset\Contents.json" />
+    <ImageAsset Include="Assets.xcassets\bomb_blast.imageset\bomb_blast.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -200,6 +222,17 @@
     <Folder Include="Assets.xcassets\triangle_vertical_selected.imageset\" />
     <Folder Include="Assets.xcassets\destroyer_ray_horisontal.imageset\" />
     <Folder Include="Assets.xcassets\destroyer_ray_vertical.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_bomb.imageset\" />
+    <Folder Include="Assets.xcassets\triangle_bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\square_bomb.imageset\" />
+    <Folder Include="Assets.xcassets\square_bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_bomb.imageset\" />
+    <Folder Include="Assets.xcassets\diamond_bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_bomb.imageset\" />
+    <Folder Include="Assets.xcassets\pentagon_bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_bomb.imageset\" />
+    <Folder Include="Assets.xcassets\hexagon_bomb_selected.imageset\" />
+    <Folder Include="Assets.xcassets\bomb_blast.imageset\" />
   </ItemGroup>
   <ItemGroup>
     <BundleResource Include="GameScene.sks" />

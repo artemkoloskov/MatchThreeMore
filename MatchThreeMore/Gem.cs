@@ -99,7 +99,11 @@ namespace MatchThreeMore
                 return GemType + "_vertical";
             }
 
-            //return "Spaceship";
+            if (IsABomb)
+            {
+                return GemType + "_bomb";
+            }
+
             return GemType + "";
         }
 
@@ -117,6 +121,11 @@ namespace MatchThreeMore
                     return GemType + "_horizontal_selected";
                 }
                 return GemType + "_vertical_selected";
+            }
+
+            if (IsABomb)
+            {
+                return GemType + "_bomb_selected";
             }
 
             return GemType + "_selected";

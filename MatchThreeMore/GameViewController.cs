@@ -22,7 +22,7 @@ namespace MatchThreeMore
         private int highScore;
         private string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
 
-        private bool chainsHadDestroyer;
+        private bool chainsHadBonuses;
 
         private UILabel timerLabel;
         private UILabel scoreLabel;
@@ -291,10 +291,10 @@ namespace MatchThreeMore
                 int delay = Properties.DestructionAnimationDuration + Properties.FallAnimationDuration;
 
                 // если был разрушитель - увеличиваем время задержки
-                if (chainsHadDestroyer)
+                if (chainsHadBonuses)
                 {
                     delay += Properties.LineDestructionDuration;
-                    chainsHadDestroyer = false;
+                    chainsHadBonuses = false;
                 }
 
                 await Task.Delay(delay);
@@ -333,9 +333,22 @@ namespace MatchThreeMore
                     {
                         if (gem.IsALineDestroyer)
                         {
-                            chainsHadDestroyer = true;
+                            chainsHadBonuses = true;
 
                             scene.AnimateLineDestroyer(gem);
+
+                            scene.AnimateTheDstructionOf(level.DestroyedChains);
+
+                            level.DestroyedChains.Clear();
+
+                            await Task.Delay(Properties.LineDestructionDuration);
+                        }
+
+                        if (gem.IsABomb)
+                        {
+                            chainsHadBonuses = true;
+
+                            scene.AnimateBomb(gem);
 
                             scene.AnimateTheDstructionOf(level.DestroyedChains);
 

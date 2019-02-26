@@ -383,41 +383,77 @@ namespace MatchThreeMore
         /// <returns><c>true</c> если нашелся хотя бы один активируемый бонус</returns>
         public void DestroyChains()
         {
-            Gem possibleDestroyer = null;
+            Gem possibleBonus = null;
             GemList chain = RetriveChain();
 
             // Повторяем процесс пока находим цепочку на уровне
             while (chain != null)
             {
                 // проверяем нет ли разрушителей в цепочке.
-                possibleDestroyer = chain.GetDestroyer();
+                possibleBonus = chain.GetBonus();
 
-                if (possibleDestroyer != null)
+                if (possibleBonus != null)
                 {
                     // Запоминаем разрушитель в списке разрушителей на анимацию
-                    BonusesToAnimate.Add(possibleDestroyer);
+                    BonusesToAnimate.Add(possibleBonus);
 
                     // Очищаем цепочку и заносим в нее весь ряд илил столбец, 
                     // в зависимости от напрваленности разрушителя
                     chain.Clear();
 
-                    if (possibleDestroyer.IsHorizontal)
+                    if (possibleBonus.IsALineDestroyer)
                     {
-                        for (int column = 0; column < ColumnsNumber; column++)
+                        if (possibleBonus.IsHorizontal)
                         {
-                            if (GemArray[possibleDestroyer.Row, column] != null)
+                            for (int column = 0; column < ColumnsNumber; column++)
                             {
-                                chain.Add(GemArray[possibleDestroyer.Row, column]);
+                                if (GemArray[possibleBonus.Row, column] != null)
+                                {
+                                    chain.Add(GemArray[possibleBonus.Row, column]);
+                                }
+                            }
+                        }
+                        else
+                        {
+                            for (int row = 0; row < RowsNumber; row++)
+                            {
+                                if (GemArray[row, possibleBonus.Column] != null)
+                                {
+                                    chain.Add(GemArray[row, possibleBonus.Column]);
+                                }
                             }
                         }
                     }
-                    else
+
+                    if (possibleBonus.IsABomb)
                     {
-                        for (int row = 0; row < RowsNumber; row++)
+                        int i;
+                        int j;
+                        if (possibleBonus.Row == 0)
                         {
-                            if (GemArray[row, possibleDestroyer.Column] != null)
+                            i = possibleBonus.Row;
+                        }
+                        else
+                        {
+                            i = possibleBonus.Row - Properties.BombBlastRadius;
+                        }
+                        if (possibleBonus.Column == 0)
+                        {
+                            j = possibleBonus.Column;
+                        }
+                        else
+                        {
+                            j = possibleBonus.Column - Properties.BombBlastRadius;
+                        }
+
+                        for (int row = i; row <= possibleBonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)
+                        {
+                            for (int column = j; column <= possibleBonus.Column + Properties.BombBlastRadius && column <= ColumnsNumber - 1; column++)
                             {
-                                chain.Add(GemArray[row, possibleDestroyer.Column]);
+                                if (GemArray[row, column] != null)
+                                {
+                                    chain.Add(GemArray[row, column]);
+                                }
                             }
                         }
                     }

@@ -29,5 +29,8 @@
 
         // Время раунда
         public const int LevelTime = 180;
+
+        // Радиус поражения бомбы
+        public const int BombBlastRadius = 2;
     }
 }
