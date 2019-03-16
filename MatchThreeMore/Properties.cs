@@ -32,5 +32,16 @@
 
         // Радиус поражения бомбы
         public const int BombBlastRadius = 2;
+
+        // Параметры для лэйблов
+        public const int HighScoreLabelWidth = 200;
+        public const int CommonLabelHeight = 50;
+        public const int CommonLabelWidth = 200;
+
+        // Координаты лэйблов на поле
+        public const int HighScoreLabelY = 25;
+        public const int TimerLabelY = 50;
+        public const int ScoreTitleLabelY = 75;
+        public const int ScoreLabelY = 100;
     }
 }

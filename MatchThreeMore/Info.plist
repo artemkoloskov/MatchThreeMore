@@ -5,7 +5,7 @@
 	<key>CFBundleName</key>
 	<string>MatchThreeMore</string>
 	<key>CFBundleIdentifier</key>
-	<string>ru.kotletka-shop.calculator</string>
+	<string>ru.kotletka-shop.KEVIN</string>
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
@@ -13,7 +13,7 @@
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
 	<key>MinimumOSVersion</key>
-	<string>10.3</string>
+	<string>9.3</string>
 	<key>UIDeviceFamily</key>
 	<array>
 		<integer>1</integer>
@@ -35,5 +35,9 @@
 	<string>Assets.xcassets/AppIcon.appiconset</string>
 	<key>XSLaunchImageAssets</key>
 	<string>Assets.xcassets/LaunchImage.launchimage</string>
+	<key>UIAppFonts</key>
+	<array>
+		<string>Segoe-UI-Light.ttf</string>
+	</array>
 </dict>
 </plist>

@@ -60,9 +60,15 @@ namespace MatchThreeMore
                 {
                     for (int column = 0; column < ColumnsNumber; column++)
                     {
-                        (GemType gemType, bool isALineDestroyer, bool isHorisontal) = LevelData.GetGemTypeFromLevelDataAt(row, column);
-
-                        GemArray[row, column] = new Gem(isALineDestroyer, isHorisontal, gemType, row, column);
+                        (GemType gemType, bool isALineDestroyer, bool isHorisontal, bool isABomb) = LevelData.GetGemTypeFromLevelDataAt(row, column);
+                        if (isABomb)
+                        {
+                            GemArray[row, column] = new Gem(isABomb, gemType, row, column);
+                        }
+                        else
+                        {
+                            GemArray[row, column] = new Gem(isALineDestroyer, isHorisontal, gemType, row, column);
+                        }
                     }
                 }
 
@@ -431,19 +437,32 @@ namespace MatchThreeMore
                         int j;
                         if (possibleBonus.Row == 0)
                         {
-                            i = possibleBonus.Row;
+                            i = 0;
                         }
                         else
                         {
-                            i = possibleBonus.Row - Properties.BombBlastRadius;
+                            if (possibleBonus.Row - Properties.BombBlastRadius < 0)
+                            {
+                                i = 0;
+                            } else
+                            {
+                                i = possibleBonus.Row - Properties.BombBlastRadius;
+                            }
                         }
                         if (possibleBonus.Column == 0)
                         {
-                            j = possibleBonus.Column;
+                            j = 0;
                         }
                         else
                         {
-                            j = possibleBonus.Column - Properties.BombBlastRadius;
+                            if (possibleBonus.Column - Properties.BombBlastRadius < 0)
+                            {
+                                j = 0;
+                            }
+                            else
+                            {
+                                j = possibleBonus.Column - Properties.BombBlastRadius;
+                            }
                         }
 
                         for (int row = i; row <= possibleBonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)

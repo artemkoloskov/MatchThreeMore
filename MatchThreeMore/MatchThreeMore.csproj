@@ -18,7 +18,7 @@
     <DefineConstants>DEBUG;ENABLE_TEST_CLOUD;</DefineConstants>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: artem.koloskov@gmail.com (4STTM4HRN3)</CodesignKey>
     <MtouchDebug>true</MtouchDebug>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchFastDev>true</MtouchFastDev>
@@ -28,6 +28,7 @@
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
     <OnDemandResourcesInitialInstallTags>sprites</OnDemandResourcesInitialInstallTags>
+    <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.KEVIN</CodesignProvision>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhone' ">
     <DebugType>pdbonly</DebugType>
@@ -35,7 +36,7 @@
     <OutputPath>bin\iPhone\Release</OutputPath>
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
-    <CodesignKey>iPhone Developer</CodesignKey>
+    <CodesignKey>iPhone Developer: artem.koloskov@gmail.com (4STTM4HRN3)</CodesignKey>
     <MtouchUseLlvm>true</MtouchUseLlvm>
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
@@ -43,7 +44,8 @@
     <MtouchArch>ARMv7</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
-<RunCodeAnalysis>true</RunCodeAnalysis>  </PropertyGroup>
+<RunCodeAnalysis>true</RunCodeAnalysis>  <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.KEVIN</CodesignProvision>
+</PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
     <Optimize>true</Optimize>
@@ -76,7 +78,7 @@
     <MtouchArch>ARMv7s, ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
-    <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.calculator</CodesignProvision>
+    <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.KEVIN</CodesignProvision>
 <RunCodeAnalysis>true</RunCodeAnalysis>  <OnDemandResourcesInitialInstallTags>sprites</OnDemandResourcesInitialInstallTags>
 <MtouchFloat32>true</MtouchFloat32>
 </PropertyGroup>
@@ -244,6 +246,9 @@
     <BundleResource Include="Dev_Level_2.json" />
     <BundleResource Include="Resources\destroyer.wav" />
     <BundleResource Include="Resources\new_destroyer.wav" />
+    <BundleResource Include="Resources\Segoe-UI-Light.ttf">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </BundleResource>
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
@@ -257,7 +262,9 @@
   <ItemGroup>
     <Compile Include="Main.cs" />
     <Compile Include="AppDelegate.cs" />
-    <Compile Include="GameViewController.cs" />
+    <Compile Include="GameViewController.cs">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Compile>
     <Compile Include="GameViewController.designer.cs">
       <DependentUpon>GameViewController.cs</DependentUpon>
     </Compile>

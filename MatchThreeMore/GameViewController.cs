@@ -64,6 +64,7 @@ namespace MatchThreeMore
             UIButton StopButton = new UIButton
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width/2 - 75, skView.Bounds.Size.Height - 100, 150, 50),
+                Font = UIFont.FromName("Segoe UI", 18f),
                 BackgroundColor = UIColor.Gray
             };
 
@@ -76,36 +77,64 @@ namespace MatchThreeMore
             };
 
             // получаем лучший счет
-            highScore = GetSetHighScore();
+            highScore = GetHighScore();
 
             // лэйбл с лучшим счетом
             highScoreLabel = new UILabel
             {
-                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 50, 150, 50),
+                Frame = new CoreGraphics.CGRect
+                (
+                    skView.Bounds.Size.Width / 2 - Properties.HighScoreLabelWidth / 2, 
+                    Properties.HighScoreLabelY, 
+                    Properties.HighScoreLabelWidth, 
+                    Properties.CommonLabelHeight
+                ),
                 TextAlignment = UITextAlignment.Center,
-                Text = "Лучший счет: " + highScore
+                Font = UIFont.FromName("Segoe UI", 18f),
+                Text = "Лучший счёт: " + highScore
             };
 
             // лэйбл с таймером
             timerLabel = new UILabel
             {
-                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 75, 150, 50),
+                Frame = new CoreGraphics.CGRect
+                (
+                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
+                    Properties.TimerLabelY,
+                    Properties.CommonLabelWidth,
+                    Properties.CommonLabelHeight
+                ),
+                Font = UIFont.FromName("Segoe UI", 18f),
                 TextAlignment = UITextAlignment.Center
             };
 
             // лэйбл с надписью Счет
             UILabel scoreTitle = new UILabel
             {
-                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 90, 150, 50),
+                Frame = new CoreGraphics.CGRect
+                (
+                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
+                    Properties.ScoreTitleLabelY,
+                    Properties.CommonLabelWidth,
+                    Properties.CommonLabelHeight
+                ),
                 TextAlignment = UITextAlignment.Center,
+                Font = UIFont.FromName("Segoe UI", 18f),
                 Text = "Счёт:"
             };
 
             // лэйбл со счетом
             scoreLabel = new UILabel
             {
-                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width / 2 - 75, 105, 150, 50),
+                Frame = new CoreGraphics.CGRect
+                (
+                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
+                    Properties.ScoreLabelY,
+                    Properties.CommonLabelWidth,
+                    Properties.CommonLabelHeight
+                ),
                 TextAlignment = UITextAlignment.Center,
+                Font = UIFont.FromName("Segoe UI", 18f),
                 Text = "0"
             };
 
@@ -126,7 +155,7 @@ namespace MatchThreeMore
         /// <summary>
         /// Загружает из файла предыдущий лучший счет
         /// </summary>
-        private int GetSetHighScore()
+        private int GetHighScore()
         {
             // счет для режима разработчика
             if (DevModeIsOn)

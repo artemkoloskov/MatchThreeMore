@@ -19,6 +19,7 @@ namespace MatchThreeMore
             UILabel gameOverLabel = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
+                Font = UIFont.FromName("Segoe UI", 18f),
                 TextAlignment = UITextAlignment.Center
             };
             gameOverLabel.Text = "Игра окончена!";
@@ -27,6 +28,7 @@ namespace MatchThreeMore
             UILabel scoreTitle = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
+                Font = UIFont.FromName("Segoe UI", 18f),
                 TextAlignment = UITextAlignment.Center
             };
             scoreTitle.Text = "Ваш счёт:";
@@ -34,11 +36,13 @@ namespace MatchThreeMore
 
             score.Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
             score.TextAlignment = UITextAlignment.Center;
+            score.Font = UIFont.FromName("Segoe UI", 18f);
             View.Add(score);
 
             UIButton startButton = new UIButton
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
+                Font = UIFont.FromName("Segoe UI", 18f),
                 BackgroundColor = UIColor.Gray
             };
 
