@@ -1,4 +1,5 @@
-﻿using System;
+﻿
+using System;
 using System.Collections.Generic;
 
 using CoreGraphics;
@@ -24,6 +25,8 @@ namespace MatchThreeMore
         private static readonly SKAction dingSound = SKAction.PlaySoundFileNamed("ding.wav", false);
         private static readonly SKAction destroySound = SKAction.PlaySoundFileNamed("destroyer.wav", false);
         private static readonly SKAction newDestroyerSound = SKAction.PlaySoundFileNamed("new_destroyer.wav", false);
+        private static readonly SKAction explosionSound = SKAction.PlaySoundFileNamed("explosion.mp3", false);
+        private static readonly SKAction newBombSound = SKAction.PlaySoundFileNamed("new_bomb.mp3", false);
 
         private float gemCellHeight;
         private float gemCellWidth;
@@ -206,16 +209,21 @@ namespace MatchThreeMore
             // маркер появления на игровом поле разрушителя, для проигрывания 
             // звука появления разрушителя
             bool hasDestroyers = false;
+            bool hasBomb = false;
 
             foreach (Gem gem in gems)
             {
                 AttachSpriteTo (gem);
 
                 hasDestroyers |= gem.IsALineDestroyer;
+                hasBomb |= gem.IsABomb;
             }
 
             // проигрывам звук появления разрушителя
-            if (hasDestroyers)
+            if (hasBomb)
+            {
+                RunAction (newBombSound);
+            } else if (hasDestroyers)
             {
                 RunAction (newDestroyerSound);
             }
@@ -230,18 +238,24 @@ namespace MatchThreeMore
             // маркер появления на игровом поле разрушителя, для проигрывания 
             // звука появления разрушителя
             bool hasDestroyers = false;
+            bool hasBomb = false;
 
             foreach (Gem gem in gems)
             {
                 AttachSpriteTo (gem);
 
                 hasDestroyers |= gem.IsALineDestroyer;
+                hasBomb |= gem.IsABomb;
             }
 
             // проигрывам звук появления разрушителя
-            if (hasDestroyers)
+            if (hasBomb)
             {
-                RunAction (newDestroyerSound);
+                RunAction(newBombSound);
+            }
+            else if (hasDestroyers)
+            {
+                RunAction(newDestroyerSound);
             }
         }
 
@@ -345,7 +359,8 @@ namespace MatchThreeMore
         {
             // маркер проверки на наличие в разрушенных цепочках разрушителя
             // если был разрушитель - звук разрушения будет другой
-            bool hadBonuses = false;
+            bool hadDestroyers = false;
+            bool hadBombs = false;
 
             if (chains == null)
             {
@@ -360,11 +375,15 @@ namespace MatchThreeMore
                     SKAction sprtieAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
                     sprite.RunAction(SKAction.Sequence(sprtieAction, SKAction.RemoveFromParent()));
 
-                    hadBonuses |= gem.IsABomb || gem.IsALineDestroyer;
+                    hadDestroyers |= gem.IsALineDestroyer;
+                    hadBombs |= gem.IsABomb;
                 }
             }
 
-            if (hadBonuses)
+            if (hadBombs)
+            {
+                RunAction(explosionSound);
+            } else if (hadDestroyers)
             {
                 RunAction(destroySound);
             }

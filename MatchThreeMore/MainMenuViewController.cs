@@ -8,6 +8,12 @@ namespace MatchThreeMore
     public partial class MainMenuViewController : UIViewController
     {
         private string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
+        public static bool IsDebugRelease =>
+            #if DEBUG
+                true;
+            #else
+                false;
+            #endif
 
         public MainMenuViewController (IntPtr handle) : base (handle)
         {
@@ -26,15 +32,6 @@ namespace MatchThreeMore
 
             startButton.SetTitle("НАЧАТЬ ИГРУ", UIControlState.Normal);
 
-            UIButton startInDevModeButton = new UIButton
-            {
-                Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 200, 150, 50),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                BackgroundColor = UIColor.Gray
-            };
-
-            startInDevModeButton.SetTitle("DEV MODE", UIControlState.Normal);
-
             // лэйбл с лучшим счетом
             UILabel highScoreLabel = new UILabel
             {
@@ -51,7 +48,7 @@ namespace MatchThreeMore
             };
 
             View.Add(startButton);
-            View.Add(startInDevModeButton);
+
             View.Add(highScoreLabel);
 
 
@@ -59,12 +56,26 @@ namespace MatchThreeMore
                 GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
                 NavigationController.PushViewController(gameView, true);
             };
+            if (IsDebugRelease)
+            {
+                UIButton startInDevModeButton = new UIButton
+                {
+                    Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 200, 150, 50),
+                    Font = UIFont.FromName("Segoe UI", 18f),
+                    BackgroundColor = UIColor.Gray
+                };
 
-            startInDevModeButton.TouchUpInside += (sender, e) => {
-                GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
-                gameView.DevModeIsOn = true;
-                NavigationController.PushViewController(gameView, true);
-            };
+                startInDevModeButton.SetTitle("DEV MODE", UIControlState.Normal);
+
+                View.Add(startInDevModeButton);
+
+                startInDevModeButton.TouchUpInside += (sender, e) =>
+                {
+                    GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
+                    gameView.DevModeIsOn = true;
+                    NavigationController.PushViewController(gameView, true);
+                };
+            }
         }
 
         /// <summary>

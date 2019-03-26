@@ -379,6 +379,144 @@ namespace MatchThreeMore
             return null;
         }
 
+        public List<GemList> RetriveAllChainsOnLevel() 
+        {
+            List<GemList> chains = new List<GemList>();
+
+            for (int row = 0; row < RowsNumber; row++)
+            {
+                for (int column = 0; column < ColumnsNumber; column++)
+                {
+                    GemList chain = GetChainAt(row, column);
+
+                    if (chain != null && chain.Count >= 3 && !chains.Contains(chain))
+                    {
+                        chains.Add(chain);
+                    }
+                }
+            }
+
+            return chains;
+        }
+
+        /// <summary>
+        /// Уничтожение цепей в массиве камешков: 
+        /// метод сканирует массив на цепочки до тех пор, пока они есть, 
+        /// найдя цепочку заносит ее в список удаляемых цепочек, после чего
+        /// уничтожает соответствующие камешки в массиве. Так же проверяет цепочки
+        /// в них бонусов, заполняет список с бонусами.
+        /// </summary>
+        /// <returns><c>true</c> если нашелся хотя бы один активируемый бонус</returns>
+        public void DestroyAllChains()
+        {
+            Gem possibleBonus = null;
+            List<GemList> chains = RetriveAllChainsOnLevel();
+
+            // Повторяем процесс пока находим цепочку на уровне
+            foreach (GemList chain in chains)
+            {
+                // проверяем нет ли разрушителей в цепочке.
+                possibleBonus = chain.GetBonus();
+
+                if (possibleBonus != null)
+                {
+                    // Запоминаем разрушитель в списке разрушителей на анимацию
+                    BonusesToAnimate.Add(possibleBonus);
+
+                    // Очищаем цепочку и заносим в нее весь ряд илил столбец, 
+                    // в зависимости от напрваленности разрушителя
+                    chain.Clear();
+
+                    if (possibleBonus.IsALineDestroyer)
+                    {
+                        if (possibleBonus.IsHorizontal)
+                        {
+                            for (int column = 0; column < ColumnsNumber; column++)
+                            {
+                                if (GemArray[possibleBonus.Row, column] != null)
+                                {
+                                    chain.Add(GemArray[possibleBonus.Row, column]);
+                                }
+                            }
+                            chains.Add(chain);
+                        }
+                        else
+                        {
+                            for (int row = 0; row < RowsNumber; row++)
+                            {
+                                if (GemArray[row, possibleBonus.Column] != null)
+                                {
+                                    chain.Add(GemArray[row, possibleBonus.Column]);
+                                }
+                            }
+                        }
+                    }
+
+                    if (possibleBonus.IsABomb)
+                    {
+                        int i;
+                        int j;
+                        if (possibleBonus.Row == 0)
+                        {
+                            i = 0;
+                        }
+                        else
+                        {
+                            if (possibleBonus.Row - Properties.BombBlastRadius < 0)
+                            {
+                                i = 0;
+                            }
+                            else
+                            {
+                                i = possibleBonus.Row - Properties.BombBlastRadius;
+                            }
+                        }
+                        if (possibleBonus.Column == 0)
+                        {
+                            j = 0;
+                        }
+                        else
+                        {
+                            if (possibleBonus.Column - Properties.BombBlastRadius < 0)
+                            {
+                                j = 0;
+                            }
+                            else
+                            {
+                                j = possibleBonus.Column - Properties.BombBlastRadius;
+                            }
+                        }
+
+                        for (int row = i; row <= possibleBonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)
+                        {
+                            for (int column = j; column <= possibleBonus.Column + Properties.BombBlastRadius && column <= ColumnsNumber - 1; column++)
+                            {
+                                if (GemArray[row, column] != null)
+                                {
+                                    chain.Add(GemArray[row, column]);
+                                }
+                            }
+                        }
+
+                        chains.Add(chain);
+                    }
+
+                }
+                // подсчитываем очки за цепочку, добавляем их к общему счету
+                int chainScore = (chain.Count - 2) * 10;
+                Score += chainScore;
+
+                // заносим цепочку в список на анимацию
+                DestroyedChains.Add(chain);
+
+                // удаляем из массива камешки в соответствии с цепью
+                chain.ForEach(gem => GemArray[gem.Row, gem.Column] = null);
+            }
+
+            //______ДЛЯ ДЕБАГА______
+            PrintOutGemArrayToConsole(false);
+        }
+
         /// <summary>
         /// Уничтожение цепей в массиве камешков: 
         /// метод сканирует массив на цепочки до тех пор, пока они есть, 

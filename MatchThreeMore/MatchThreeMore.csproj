@@ -41,10 +41,13 @@
     <MtouchFloat32>true</MtouchFloat32>
     <CodesignEntitlements>Entitlements.plist</CodesignEntitlements>
     <MtouchLink>SdkOnly</MtouchLink>
-    <MtouchArch>ARMv7</MtouchArch>
+    <MtouchArch>ARMv7s, ARM64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
 <RunCodeAnalysis>true</RunCodeAnalysis>  <CodesignProvision>iOS Team Provisioning Profile: ru.kotletka-shop.KEVIN</CodesignProvision>
+<DeviceSpecificBuild>true</DeviceSpecificBuild>
+<MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
+<MtouchFastDev>true</MtouchFastDev>
 </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Release|iPhoneSimulator' ">
     <DebugType>pdbonly</DebugType>
@@ -55,9 +58,11 @@
     <CodesignKey>iPhone Developer</CodesignKey>
     <MtouchNoSymbolStrip>true</MtouchNoSymbolStrip>
     <MtouchLink>None</MtouchLink>
-    <MtouchArch>x86_64</MtouchArch>
+    <MtouchArch>i386, x86_64</MtouchArch>
     <MtouchHttpClientHandler>NSUrlSessionHandler</MtouchHttpClientHandler>
     <PlatformTarget>x86</PlatformTarget>
+    <DeviceSpecificBuild>true</DeviceSpecificBuild>
+    <MtouchFastDev>true</MtouchFastDev>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|iPhone' ">
     <DebugSymbols>true</DebugSymbols>
@@ -102,65 +107,35 @@
     <ImageAsset Include="Assets.xcassets\bomb_selected.imageset\bomb_selected.png" />
     <ImageAsset Include="Assets.xcassets\bomb_selected.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\diamond.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond.imageset\diamond.png" />
     <ImageAsset Include="Assets.xcassets\diamond_horizontal.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond_horizontal.imageset\diamond_horizontal.png" />
     <ImageAsset Include="Assets.xcassets\diamond_horizontal_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond_horizontal_selected.imageset\diamond_horizontal_selected.png" />
     <ImageAsset Include="Assets.xcassets\diamond_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond_selected.imageset\diamond_selected.png" />
     <ImageAsset Include="Assets.xcassets\diamond_vertical.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond_vertical.imageset\diamond_vertical.png" />
     <ImageAsset Include="Assets.xcassets\diamond_vertical_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\diamond_vertical_selected.imageset\diamond_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\hexagon.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon.imageset\hexagon.png" />
     <ImageAsset Include="Assets.xcassets\hexagon_horizontal.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon_horizontal.imageset\hexagon_horizontal.png" />
     <ImageAsset Include="Assets.xcassets\hexagon_horizontal_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon_horizontal_selected.imageset\hexagon_horizontal_selected.png" />
     <ImageAsset Include="Assets.xcassets\hexagon_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon_selected.imageset\hexagon_selected.png" />
     <ImageAsset Include="Assets.xcassets\hexagon_vertical.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon_vertical.imageset\hexagon_vertical.png" />
     <ImageAsset Include="Assets.xcassets\hexagon_vertical_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\hexagon_vertical_selected.imageset\hexagon_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\pentagon.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon.imageset\pentagon.png" />
     <ImageAsset Include="Assets.xcassets\pentagon_horizontal.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon_horizontal.imageset\pentagon_horizontal.png" />
     <ImageAsset Include="Assets.xcassets\pentagon_horizontal_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon_horizontal_selected.imageset\pentagon_horizontal_selected.png" />
     <ImageAsset Include="Assets.xcassets\pentagon_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon_selected.imageset\pentagon_selected.png" />
     <ImageAsset Include="Assets.xcassets\pentagon_vertical.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon_vertical.imageset\pentagon_vertical.png" />
     <ImageAsset Include="Assets.xcassets\pentagon_vertical_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\pentagon_vertical_selected.imageset\pentagon_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\square.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square.imageset\square.png" />
     <ImageAsset Include="Assets.xcassets\square_horizontal.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square_horizontal.imageset\square_horizontal.png" />
     <ImageAsset Include="Assets.xcassets\square_horizontal_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square_horizontal_selected.imageset\square_horizontal_selected.png" />
     <ImageAsset Include="Assets.xcassets\square_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square_selected.imageset\square_selected.png" />
     <ImageAsset Include="Assets.xcassets\square_vertical.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square_vertical.imageset\square_vertical.png" />
     <ImageAsset Include="Assets.xcassets\square_vertical_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\square_vertical_selected.imageset\square_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\triangle.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle.imageset\triangle.png" />
     <ImageAsset Include="Assets.xcassets\triangle_horizontal.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_horizontal.imageset\triangle_horizontal.png" />
     <ImageAsset Include="Assets.xcassets\triangle_horizontal_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_horizontal_selected.imageset\triangle_horizontal_selected.png" />
     <ImageAsset Include="Assets.xcassets\triangle_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_selected.imageset\triangle_selected.png" />
     <ImageAsset Include="Assets.xcassets\triangle_vertical.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_vertical.imageset\triangle_vertical.png" />
     <ImageAsset Include="Assets.xcassets\triangle_vertical_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_vertical_selected.imageset\triangle_vertical_selected.png" />
     <ImageAsset Include="Assets.xcassets\destroyer_ray_horisontal.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\destroyer_ray_vertical.imageset\diamond_vertical_selected.png" />
@@ -175,18 +150,88 @@
     <ImageAsset Include="Assets.xcassets\pentagon_bomb_selected.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\hexagon_bomb.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\hexagon_bomb_selected.imageset\Contents.json" />
-    <ImageAsset Include="Assets.xcassets\triangle_bomb.imageset\triangle_bomb.png" />
-    <ImageAsset Include="Assets.xcassets\triangle_bomb_selected.imageset\triangle_bomb_selected.png" />
-    <ImageAsset Include="Assets.xcassets\square_bomb.imageset\square_bomb.png" />
-    <ImageAsset Include="Assets.xcassets\square_bomb_selected.imageset\square_bomb_selected.png" />
-    <ImageAsset Include="Assets.xcassets\diamond_bomb.imageset\diamond_bomb.png" />
-    <ImageAsset Include="Assets.xcassets\diamond_bomb_selected.imageset\diamond_bomb_selected.png" />
-    <ImageAsset Include="Assets.xcassets\pentagon_bomb.imageset\pentagon_bomb.png" />
-    <ImageAsset Include="Assets.xcassets\pentagon_bomb_selected.imageset\pentagon_bomb_selected.png" />
-    <ImageAsset Include="Assets.xcassets\hexagon_bomb.imageset\hexagon_bomb.png" />
-    <ImageAsset Include="Assets.xcassets\hexagon_bomb_selected.imageset\hexagon_bomb_selected.png" />
     <ImageAsset Include="Assets.xcassets\bomb_blast.imageset\Contents.json" />
     <ImageAsset Include="Assets.xcassets\bomb_blast.imageset\bomb_blast.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-40.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-60.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-58.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-87.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-80.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-120.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-120-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-180.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-20.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-40-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-29.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-58-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-40-2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-80-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-76.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-152.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-167.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-1024.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-120-2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-180-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-48.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-55.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-58-2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-87-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-80-2.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-88.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-100.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-172.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-196.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-1024-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-16.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-32.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-32-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-64.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-128.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-256.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-256-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-512.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-512-1.png" />
+    <ImageAsset Include="Assets.xcassets\AppIcon.appiconset\Icon-1024-2.png" />
+    <ImageAsset Include="Assets.xcassets\diamond.imageset\diamond-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb.imageset\diamond_bomb-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_bomb_selected.imageset\diamond_bomb_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal.imageset\diamond_horizontal-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_horizontal_selected.imageset\diamond_horizontal_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_selected.imageset\diamond_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical.imageset\diamond_vertical-1.png" />
+    <ImageAsset Include="Assets.xcassets\diamond_vertical_selected.imageset\diamond_vertical_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon.imageset\hexagon-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb.imageset\hexagon_bomb-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_bomb_selected.imageset\hexagon_bomb_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal.imageset\hexagon_horizontal-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_horizontal_selected.imageset\hexagon_horizontal_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_selected.imageset\hexagon_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical.imageset\hexagon_vertical-1.png" />
+    <ImageAsset Include="Assets.xcassets\hexagon_vertical_selected.imageset\hexagon_vertical_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon.imageset\pentagon-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb.imageset\pentagon_bomb-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_bomb_selected.imageset\pentagon_bomb_selected.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal.imageset\pentagon_horizontal-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_horizontal_selected.imageset\pentagon_horizontal_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_selected.imageset\pentagon_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical.imageset\pentagon_vertical-1.png" />
+    <ImageAsset Include="Assets.xcassets\pentagon_vertical_selected.imageset\pentagon_vertical_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\square.imageset\square-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_bomb.imageset\square_bomb-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_bomb_selected.imageset\square_bomb_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal.imageset\square_horizontal-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_horizontal_selected.imageset\square_horizontal_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_vertical.imageset\square_vertical-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_vertical_selected.imageset\square_vertical_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle.imageset\triangle-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb.imageset\triangle_bomb-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_bomb_selected.imageset\triangle_bomb_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal.imageset\triangle_horizontal-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_horizontal_selected.imageset\triangle_horizontal_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_selected.imageset\triangle_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical.imageset\triangle_vertical-1.png" />
+    <ImageAsset Include="Assets.xcassets\triangle_vertical_selected.imageset\triangle_vertical_selected-1.png" />
+    <ImageAsset Include="Assets.xcassets\square_selected.imageset\square_selected.png" />
   </ItemGroup>
   <ItemGroup>
     <Folder Include="Resources\" />
@@ -249,6 +294,8 @@
     <BundleResource Include="Resources\Segoe-UI-Light.ttf">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </BundleResource>
+    <BundleResource Include="Resources\explosion.mp3" />
+    <BundleResource Include="Resources\new_bomb.mp3" />
   </ItemGroup>
   <ItemGroup>
     <InterfaceDefinition Include="LaunchScreen.storyboard" />
