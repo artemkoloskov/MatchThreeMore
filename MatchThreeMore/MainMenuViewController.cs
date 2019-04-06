@@ -60,7 +60,7 @@ namespace MatchThreeMore
             {
                 UIButton startInDevModeButton = new UIButton
                 {
-                    Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 200, 150, 50),
+                    Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 175, 150, 50),
                     Font = UIFont.FromName("Segoe UI", 18f),
                     BackgroundColor = UIColor.Gray
                 };

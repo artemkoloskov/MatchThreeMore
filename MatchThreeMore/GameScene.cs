@@ -15,10 +15,12 @@ namespace MatchThreeMore
     {
         public Level Level { get; set; }
         public Del SwipeHandler;
+        public bool GameIsPaused;
 
         private SKNode gameLayer = new SKNode();
         private SKNode gemLayer = new SKNode();
         private SKSpriteNode selectedSprite = new SKSpriteNode();
+        private SKSpriteNode background = new SKSpriteNode("background.jpg");
 
         private static readonly SKAction swapSound = SKAction.PlaySoundFileNamed("swap.wav", false);
         private static readonly SKAction errorSound = SKAction.PlaySoundFileNamed("error.wav", false);
@@ -49,13 +51,8 @@ namespace MatchThreeMore
             gemCellHeight = gemCellWidth;
 
             // Устанавливаем бэкграунд из текстуры
-            SKSpriteNode background = new SKSpriteNode("background.jpg")
-            {
-                Size = Size,
-                // Размещаем его позади по оси Z, если этого не делать - спрайт ноды камешков могут
-                // спауниться позади бэкграунда
-                ZPosition = 1
-            };
+            background.Size = Size;
+            background.ZPosition = 1;
             AddChild(background);
 
             // добавляем на сцену основной нод игры, в который будут добавлены остальные элементы уровня
@@ -73,6 +70,10 @@ namespace MatchThreeMore
 
         public override void TouchesBegan(NSSet touches, UIEvent evt)
         {
+            if (GameIsPaused)
+            {
+                return;
+            }
             // Определение валидности свайпа и столбца-ряда, с которого начинается свайп
             foreach (NSObject touch in touches)
             {
@@ -95,7 +96,7 @@ namespace MatchThreeMore
         public override void TouchesMoved(NSSet touches, UIEvent evt)
         {
             // определение направления свайпа
-            if (swipeIsValid)
+            if (swipeIsValid && !GameIsPaused)
             {
                 foreach (NSObject touch in touches)
                 {
@@ -137,7 +138,7 @@ namespace MatchThreeMore
         public override void TouchesEnded(NSSet touches, UIEvent evt)
         {
             // когда прикосновение кончается снимаем подсветку камешка
-            if (selectedSprite.Parent != null && swipeIsValid)
+            if (selectedSprite.Parent != null && swipeIsValid && !GameIsPaused)
             {
                 HideSelectionIndicator();
             }
@@ -149,6 +150,18 @@ namespace MatchThreeMore
         }
 
         //++++++++++ДОПОЛНИТЕЛЬНЫЙЕ МЕТОДЫ+++++++++++++
+
+        public void SwitchBacgroundZPosition ()
+        {
+            if (background.ZPosition == 1)
+            {
+                background.ZPosition = 150;
+            }
+            else
+            {
+                background.ZPosition = 1;
+            }
+        }
 
         /// <summary>
         /// Добававляем его спрайт на нод для камешка, с расчетом размера и позиции

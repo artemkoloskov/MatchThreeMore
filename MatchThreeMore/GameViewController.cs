@@ -27,6 +27,7 @@ namespace MatchThreeMore
         private UILabel timerLabel;
         private UILabel scoreLabel;
         private UILabel highScoreLabel;
+        private UILabel pauseLabel;
 
         protected GameViewController(IntPtr handle) : base(handle)
         {
@@ -61,19 +62,37 @@ namespace MatchThreeMore
             scene.SwipeHandler = HandleSwipeAsync;
 
             // Кнопка "В меню"
-            UIButton StopButton = new UIButton
+            UIButton stopButton = new UIButton
             {
-                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width/2 - 75, skView.Bounds.Size.Height - 100, 150, 50),
+                Frame = new CoreGraphics.CGRect(30, View.Bounds.Size.Height - 100, 120, 45),
                 Font = UIFont.FromName("Segoe UI", 18f),
                 BackgroundColor = UIColor.Gray
             };
 
-            StopButton.SetTitle("В МЕНЮ", UIControlState.Normal);
+            stopButton.SetTitle("В МЕНЮ", UIControlState.Normal);
 
-            StopButton.TouchUpInside += (sender, e) => {
+            stopButton.TouchUpInside += (sender, e) =>
+            {
                 gameTimer.Invalidate();
                 UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
                 NavigationController.PushViewController(mainMenu, true);
+            };
+
+            // Кнопка паузы
+            UIButton pauseButton = new UIButton
+            {
+                Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width - 150, View.Bounds.Size.Height - 100, 120, 45),
+                Font = UIFont.FromName("Segoe UI", 18f),
+                BackgroundColor = UIColor.Gray
+            };
+
+            pauseButton.SetTitle("||", UIControlState.Normal);
+
+            pauseButton.TouchUpInside += (sender, e) =>
+            {
+                pauseLabel.Hidden = scene.GameIsPaused;
+                scene.GameIsPaused = !scene.GameIsPaused;
+                scene.SwitchBacgroundZPosition();
             };
 
             // получаем лучший счет
@@ -138,12 +157,30 @@ namespace MatchThreeMore
                 Text = "0"
             };
 
+            // лэйбл с надписью Пауза
+            pauseLabel = new UILabel
+            {
+                Hidden = true,
+                Frame = new CoreGraphics.CGRect
+                (
+                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
+                    skView.Bounds.Size.Height / 2 - Properties.CommonLabelHeight / 2,
+                    Properties.CommonLabelWidth,
+                    Properties.CommonLabelHeight
+                ),
+                TextAlignment = UITextAlignment.Center,
+                Font = UIFont.FromName("Segoe UI", 18f),
+                Text = "ПАУЗА"
+            };
+
             // добавляем элементы интерфейса на вью
-            skView.Add(StopButton);
+            skView.Add(stopButton);
+            skView.Add(pauseButton);
             skView.Add(highScoreLabel);
             skView.Add(timerLabel);
             skView.Add(scoreTitle);
             skView.Add(scoreLabel);
+            skView.Add(pauseLabel);
 
             // Present the scene.
             skView.PresentScene(scene);
@@ -248,7 +285,10 @@ namespace MatchThreeMore
         /// <returns>Текущее время таймера.</returns>
         private int TimerAction ()
         {
-            currentTime--;
+            if (!scene.GameIsPaused)
+            {
+                currentTime--;
+            }
 
             int minutes = Math.Abs(currentTime / 60);
             int seconds = currentTime % 60;
