@@ -7,6 +7,8 @@ using SpriteKit;
 using UIKit;
 using System.IO;
 
+using static MatchThreeMore.Properties;
+
 namespace MatchThreeMore
 {
     public partial class GameViewController : UIViewController
@@ -17,7 +19,7 @@ namespace MatchThreeMore
         private GameScene scene;
 
         private NSTimer gameTimer;
-        private int currentTime = Properties.LevelTime;
+        private int currentTime = LevelTime;
 
         private int highScore;
         private string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
@@ -40,8 +42,8 @@ namespace MatchThreeMore
 
             // Configure the view.
             SKView skView = (SKView)View;
-            skView.ShowsFPS = true;
-            skView.ShowsNodeCount = true;
+            skView.ShowsFPS = DevModeIsOn;
+            skView.ShowsNodeCount = DevModeIsOn;
 
             /* Sprite Kit applies additional optimizations to improve rendering performance */
             skView.IgnoresSiblingOrder = true;
@@ -65,8 +67,8 @@ namespace MatchThreeMore
             UIButton stopButton = new UIButton
             {
                 Frame = new CoreGraphics.CGRect(30, View.Bounds.Size.Height - 100, 120, 45),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                BackgroundColor = UIColor.Gray
+                Font = CommonFont,
+                BackgroundColor = ButtonColor
             };
 
             stopButton.SetTitle("В МЕНЮ", UIControlState.Normal);
@@ -82,8 +84,8 @@ namespace MatchThreeMore
             UIButton pauseButton = new UIButton
             {
                 Frame = new CoreGraphics.CGRect(skView.Bounds.Size.Width - 150, View.Bounds.Size.Height - 100, 120, 45),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                BackgroundColor = UIColor.Gray
+                Font = CommonFont,
+                BackgroundColor = ButtonColor
             };
 
             pauseButton.SetTitle("||", UIControlState.Normal);
@@ -103,14 +105,15 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect
                 (
-                    skView.Bounds.Size.Width / 2 - Properties.HighScoreLabelWidth / 2, 
-                    Properties.HighScoreLabelY, 
-                    Properties.HighScoreLabelWidth, 
-                    Properties.CommonLabelHeight
+                    skView.Bounds.Size.Width / 2 - HighScoreLabelWidth / 2,
+                    HighScoreLabelY,
+                    HighScoreLabelWidth,
+                    CommonLabelHeight
                 ),
                 TextAlignment = UITextAlignment.Center,
-                Font = UIFont.FromName("Segoe UI", 18f),
-                Text = "Лучший счёт: " + highScore
+                Font = CommonFont,
+                Text = "Лучший счёт: " + highScore,
+                TextColor = UIColor.White
             };
 
             // лэйбл с таймером
@@ -118,13 +121,14 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect
                 (
-                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
-                    Properties.TimerLabelY,
-                    Properties.CommonLabelWidth,
-                    Properties.CommonLabelHeight
+                    skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
+                    TimerLabelY,
+                    CommonLabelWidth,
+                    CommonLabelHeight
                 ),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                TextAlignment = UITextAlignment.Center
+                Font = CommonFont,
+                TextAlignment = UITextAlignment.Center,
+                TextColor = UIColor.White
             };
 
             // лэйбл с надписью Счет
@@ -132,14 +136,15 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect
                 (
-                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
-                    Properties.ScoreTitleLabelY,
-                    Properties.CommonLabelWidth,
-                    Properties.CommonLabelHeight
+                    skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
+                    ScoreTitleLabelY,
+                    CommonLabelWidth,
+                    CommonLabelHeight
                 ),
                 TextAlignment = UITextAlignment.Center,
-                Font = UIFont.FromName("Segoe UI", 18f),
-                Text = "Счёт:"
+                Font = CommonFont,
+                Text = "Счёт:",
+                TextColor = UIColor.White
             };
 
             // лэйбл со счетом
@@ -147,14 +152,15 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect
                 (
-                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
-                    Properties.ScoreLabelY,
-                    Properties.CommonLabelWidth,
-                    Properties.CommonLabelHeight
+                    skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
+                    ScoreLabelY,
+                    CommonLabelWidth,
+                    CommonLabelHeight
                 ),
                 TextAlignment = UITextAlignment.Center,
-                Font = UIFont.FromName("Segoe UI", 18f),
-                Text = "0"
+                Font = CommonFont,
+                Text = "0",
+                TextColor = UIColor.White
             };
 
             // лэйбл с надписью Пауза
@@ -163,14 +169,15 @@ namespace MatchThreeMore
                 Hidden = true,
                 Frame = new CoreGraphics.CGRect
                 (
-                    skView.Bounds.Size.Width / 2 - Properties.CommonLabelWidth / 2,
-                    skView.Bounds.Size.Height / 2 - Properties.CommonLabelHeight / 2,
-                    Properties.CommonLabelWidth,
-                    Properties.CommonLabelHeight
+                    skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
+                    skView.Bounds.Size.Height / 2 - CommonLabelHeight / 2,
+                    CommonLabelWidth,
+                    CommonLabelHeight
                 ),
                 TextAlignment = UITextAlignment.Center,
-                Font = UIFont.FromName("Segoe UI", 18f),
-                Text = "ПАУЗА"
+                Font = CommonFont,
+                Text = "ПАУЗА",
+                TextColor = UIColor.White
             };
 
             // добавляем элементы интерфейса на вью
@@ -351,18 +358,18 @@ namespace MatchThreeMore
 
                 // анимируем обмен на сцене
                 scene.Animate(swap, swapIsValid);
-                await Task.Delay(Properties.SwapAnimationDuration);
+                await Task.Delay(SwapAnimationDuration);
 
                 // обрабатываем полученные цепочки
                 await HandleChains();
 
                 // задержка, нужная для всех анимаций перед тем,как включать интерактивность
-                int delay = Properties.DestructionAnimationDuration + Properties.FallAnimationDuration;
+                int delay = DestructionAnimationDuration + FallAnimationDuration;
 
                 // если был разрушитель - увеличиваем время задержки
                 if (chainsHadBonuses)
                 {
-                    delay += Properties.LineDestructionDuration;
+                    delay += LineDestructionDuration;
                     chainsHadBonuses = false;
                 }
 
@@ -374,7 +381,7 @@ namespace MatchThreeMore
             {
                 scene.Animate(swap, swapIsValid);
 
-                await Task.Delay(Properties.SwapAnimationDuration * 2);
+                await Task.Delay(SwapAnimationDuration * 2);
 
                 View.UserInteractionEnabled = true;
             }
@@ -410,7 +417,7 @@ namespace MatchThreeMore
 
                             level.DestroyedChains.Clear();
 
-                            await Task.Delay(Properties.LineDestructionDuration);
+                            await Task.Delay(LineDestructionDuration);
                         }
 
                         if (gem.IsABomb)
@@ -423,7 +430,7 @@ namespace MatchThreeMore
 
                             level.DestroyedChains.Clear();
 
-                            await Task.Delay(Properties.LineDestructionDuration);
+                            await Task.Delay(LineDestructionDuration);
                         }
                     }
 
@@ -437,12 +444,12 @@ namespace MatchThreeMore
 
                     level.DestroyedChains.Clear();
 
-                    await Task.Delay(Properties.DestructionAnimationDuration);
+                    await Task.Delay(DestructionAnimationDuration);
                 }
 
                 // анимируем падение камешков
                 scene.AnimateFallingGemsIn(level.DropGems());
-                await Task.Delay(Properties.FallAnimationDuration);
+                await Task.Delay(FallAnimationDuration);
 
             }
 

@@ -2,6 +2,9 @@ using Foundation;
 using System;
 using UIKit;
 
+using static MatchThreeMore.AdditionalMethods;
+using static MatchThreeMore.Properties;
+
 namespace MatchThreeMore
 {
     public partial class GameOverViewController : UIViewController
@@ -16,10 +19,17 @@ namespace MatchThreeMore
         {
             base.ViewDidLoad();
 
+            // Устанавливаем бэкграунд из текстуры
+            UIImageView background = new UIImageView(
+                ResizeUIImage(
+                    UIImage.FromFile("background.jpg"), (float)View.Bounds.Size.Width, (float)View.Bounds.Size.Height));
+
+            View.Add(background);
+
             UILabel gameOverLabel = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
-                Font = UIFont.FromName("Segoe UI", 18f),
+                Font = CommonFont,
                 TextAlignment = UITextAlignment.Center
             };
             gameOverLabel.Text = "Игра окончена!";
@@ -28,7 +38,7 @@ namespace MatchThreeMore
             UILabel scoreTitle = new UILabel
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
-                Font = UIFont.FromName("Segoe UI", 18f),
+                Font = CommonFont,
                 TextAlignment = UITextAlignment.Center
             };
             scoreTitle.Text = "Ваш счёт:";
@@ -36,14 +46,14 @@ namespace MatchThreeMore
 
             score.Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
             score.TextAlignment = UITextAlignment.Center;
-            score.Font = UIFont.FromName("Segoe UI", 18f);
+            score.Font = UIFont.FromName("GillSans-BoldItalic", 18f);
             View.Add(score);
 
             UIButton startButton = new UIButton
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                BackgroundColor = UIColor.Gray
+                Font = CommonFont,
+                BackgroundColor = ButtonColor
             };
 
             startButton.SetTitle("В МЕНЮ", UIControlState.Normal);

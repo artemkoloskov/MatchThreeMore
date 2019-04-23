@@ -388,6 +388,8 @@ namespace MatchThreeMore
                     SKAction sprtieAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
                     sprite.RunAction(SKAction.Sequence(sprtieAction, SKAction.RemoveFromParent()));
 
+                    AnimateScore(chain);
+
                     hadDestroyers |= gem.IsALineDestroyer;
                     hadBombs |= gem.IsABomb;
                 }
@@ -404,6 +406,35 @@ namespace MatchThreeMore
             {
                 RunAction(dingSound);
             }
+        }
+
+        /// <summary>
+        /// Анимация счета за уничтожение цепочки
+        /// </summary>
+        /// <param name="chain">Уничтожаемая цепочка.</param>
+        private void AnimateScore(GemList chain)
+        {
+            SKSpriteNode firstGem = chain.GetFirstGem().Sprite;
+            SKSpriteNode lastGem = chain.GetLastGem().Sprite;
+
+            CGPoint centerPoint = new CGPoint(
+                (firstGem.Position.X + lastGem.Position.X) / 2,
+                (firstGem.Position.Y + lastGem.Position.Y) / 2 - 8);
+
+            SKLabelNode scoreLabel = new SKLabelNode("GillSans-BoldItalic")
+            {
+                FontSize = 16,
+                Text = chain.GetScore() + "",
+                Position = centerPoint,
+                ZPosition = 300
+            };
+
+            gemLayer.AddChild(scoreLabel);
+
+            SKAction moveAction = SKAction.MoveBy(0, 3, 0.7);
+            //.Move(by: CGVector(dx: 0, dy: 3), duration: 0.7)
+            moveAction.TimingMode = SKActionTimingMode.EaseOut;
+            scoreLabel.RunAction(SKAction.Sequence(moveAction, SKAction.RemoveFromParent()));
         }
 
         /// <summary>

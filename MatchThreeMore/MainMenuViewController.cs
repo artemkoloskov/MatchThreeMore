@@ -1,7 +1,12 @@
+using CoreGraphics;
 using Foundation;
+using SpriteKit;
 using System;
 using System.IO;
 using UIKit;
+
+using static MatchThreeMore.AdditionalMethods;
+using static MatchThreeMore.Properties;
 
 namespace MatchThreeMore
 {
@@ -19,15 +24,24 @@ namespace MatchThreeMore
         {
         }
 
+
+
         public override void ViewDidLoad()
         {
             base.ViewDidLoad();
 
+            // Устанавливаем бэкграунд из текстуры
+            UIImageView background = new UIImageView(
+                ResizeUIImage(
+                    UIImage.FromFile("background.jpg"), (float)View.Bounds.Size.Width, (float)View.Bounds.Size.Height));
+
+            View.Add(background);
+
             UIButton startButton = new UIButton
             {
-                Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
-                Font = UIFont.FromName("Segoe UI", 18f),
-                BackgroundColor = UIColor.Gray
+                Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
+                Font = CommonFont,
+                BackgroundColor = ButtonColor
             };
 
             startButton.SetTitle("НАЧАТЬ ИГРУ", UIControlState.Normal);
@@ -35,15 +49,15 @@ namespace MatchThreeMore
             // лэйбл с лучшим счетом
             UILabel highScoreLabel = new UILabel
             {
-                Frame = new CoreGraphics.CGRect
+                Frame = new CGRect
                 (
-                    View.Bounds.Size.Width / 2 - Properties.HighScoreLabelWidth / 2,
-                    Properties.HighScoreLabelY + 100,
-                    Properties.HighScoreLabelWidth,
-                    Properties.CommonLabelHeight
+                    View.Bounds.Size.Width / 2 - HighScoreLabelWidth / 2,
+                    HighScoreLabelY + 100,
+                    HighScoreLabelWidth,
+                    CommonLabelHeight
                 ),
                 TextAlignment = UITextAlignment.Center,
-                Font = UIFont.FromName("Segoe UI", 18f),
+                Font = CommonFont,
                 Text = "Лучший счёт: " + GetHighScore()
             };
 
@@ -60,9 +74,9 @@ namespace MatchThreeMore
             {
                 UIButton startInDevModeButton = new UIButton
                 {
-                    Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 175, 150, 50),
-                    Font = UIFont.FromName("Segoe UI", 18f),
-                    BackgroundColor = UIColor.Gray
+                    Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 175, 150, 50),
+                    Font = CommonFont,
+                    BackgroundColor = ButtonColor
                 };
 
                 startInDevModeButton.SetTitle("DEV MODE", UIControlState.Normal);

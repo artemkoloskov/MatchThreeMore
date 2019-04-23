@@ -1,4 +1,8 @@
-﻿namespace MatchThreeMore
+﻿using System;
+using CoreGraphics;
+using UIKit;
+
+namespace MatchThreeMore
 {
     /// <summary>
     /// Класс с основными параметрами игры
@@ -43,5 +47,28 @@
         public const int TimerLabelY = 50;
         public const int ScoreTitleLabelY = 75;
         public const int ScoreLabelY = 100;
+
+        // Цвет кнопок
+        public static readonly UIColor ButtonColor = new UIColor(red: 0.64f, green: 0.76f, blue: 0.97f, alpha: 1.0f);
+
+        // Шрифт
+        public static readonly UIFont CommonFont = UIFont.FromName("GillSans-BoldItalic", 18f);
+    }
+
+    public static class AdditionalMethods
+    {
+        public static UIImage ResizeUIImage(UIImage sourceImage, float widthToScale, float heightToScale)
+        {
+            CGSize sourceSize = sourceImage.Size;
+            double maxResizeFactor = Math.Max(widthToScale / sourceSize.Width, heightToScale / sourceSize.Height);
+            double width = maxResizeFactor * sourceSize.Width;
+            double height = maxResizeFactor * sourceSize.Height;
+            UIGraphics.BeginImageContext(new CGSize(width, height));
+            sourceImage.Draw(new CGRect(0, 0, width, height));
+            var resultImage = UIGraphics.GetImageFromCurrentImageContext();
+            UIGraphics.EndImageContext();
+
+            return resultImage;
+        }
     }
 }
