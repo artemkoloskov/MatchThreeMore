@@ -58,7 +58,8 @@ namespace MatchThreeMore
                 ),
                 TextAlignment = UITextAlignment.Center,
                 Font = CommonFont,
-                Text = "Лучший счёт: " + GetHighScore()
+                Text = "Лучший счёт: " + GetHighScore(),
+                TextColor = UIColor.White
             };
 
             View.Add(startButton);

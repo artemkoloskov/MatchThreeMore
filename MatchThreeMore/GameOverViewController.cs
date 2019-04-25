@@ -30,7 +30,8 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
                 Font = CommonFont,
-                TextAlignment = UITextAlignment.Center
+                TextAlignment = UITextAlignment.Center,
+                TextColor = UIColor.White
             };
             gameOverLabel.Text = "Игра окончена!";
             View.Add(gameOverLabel);
@@ -39,7 +40,8 @@ namespace MatchThreeMore
             {
                 Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
                 Font = CommonFont,
-                TextAlignment = UITextAlignment.Center
+                TextAlignment = UITextAlignment.Center,
+                TextColor = UIColor.White
             };
             scoreTitle.Text = "Ваш счёт:";
             View.Add(scoreTitle);
@@ -47,6 +49,7 @@ namespace MatchThreeMore
             score.Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
             score.TextAlignment = UITextAlignment.Center;
             score.Font = UIFont.FromName("GillSans-BoldItalic", 18f);
+            score.TextColor = UIColor.White;
             View.Add(score);
 
             UIButton startButton = new UIButton

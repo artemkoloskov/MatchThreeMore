@@ -15,7 +15,6 @@ namespace MatchThreeMore
         public List<Swap> Swaps { get; set; } = new List<Swap>();
         public int Score { get; set; }
 
-       
         public int RowsNumber { get; }
         public int ColumnsNumber { get; }
         public bool DevModeIsOn { get; }
@@ -25,7 +24,7 @@ namespace MatchThreeMore
         /// Конструктор класса <see cref="T:MatchThreeMore.Level"/>.
         /// </summary>
         /// <param name="devMode">Если <c>true</c> активирует режим разработчика.</param>
-        public Level (bool devMode)
+        public Level(bool devMode)
         {
             DevModeIsOn = devMode;
 
@@ -131,8 +130,8 @@ namespace MatchThreeMore
                         {
                             // Запоминаем камешек в следующем столбце
                             Gem otherGem = GemArray[row, column + 1];
-                             if (otherGem != null)
-                             {
+                            if (otherGem != null)
+                            {
                                 // Меняем местами камешки в массиве
                                 GemArray[row, column] = otherGem;
                                 GemArray[row, column + 1] = gem;
@@ -253,7 +252,8 @@ namespace MatchThreeMore
                                 Console.Write(GemArray[row, column].GemType.ToString().Substring(0, 1) + " ");
                         }
 
-                    } else
+                    }
+                    else
                     {
                         Console.Write("_ ");
                     }
@@ -379,7 +379,7 @@ namespace MatchThreeMore
             return null;
         }
 
-        public List<GemList> RetriveAllChainsOnLevel() 
+        public List<GemList> RetriveAllChainsOnLevel()
         {
             List<GemList> chains = new List<GemList>();
 
@@ -409,94 +409,103 @@ namespace MatchThreeMore
         /// <returns><c>true</c> если нашелся хотя бы один активируемый бонус</returns>
         public void DestroyChains()
         {
-            Gem bonus = null;
             GemList chain = RetriveChain();
 
             // Повторяем процесс пока находим цепочку на уровне
             while (chain != null)
             {
-                // проверяем нет ли разрушителей в цепочке.
-                bonus = chain.GetBonus();
+                GemList bonuses;
+                bool needToReiterrate = true;
 
-                if (bonus != null)
+                while (needToReiterrate)
                 {
-                    // Запоминаем разрушитель в списке разрушителей на анимацию
-                    BonusesToAnimate.Add(bonus);
+                    needToReiterrate = false;
 
-                    // Очищаем цепочку и заносим в нее весь ряд илил столбец, 
-                    // в зависимости от напрваленности разрушителя
-                    // chain.Clear();
+                    bonuses = chain.GetAllBonuses();
 
-                    if (bonus.IsALineDestroyer)
+                    foreach (Gem bonus in bonuses)
                     {
-                        if (bonus.IsHorizontal)
+                        // Запоминаем разрушитель в списке разрушителей на анимацию
+                        if (!BonusesToAnimate.Contains(bonus))
                         {
-                            for (int column = 0; column < ColumnsNumber; column++)
+                            BonusesToAnimate.Add(bonus);
+                        }
+
+                        // Заносим в цепочку весь ряд илил столбец, 
+                        // в зависимости от напрваленности разрушителя
+                        if (bonus.IsALineDestroyer)
+                        {
+                            if (bonus.IsHorizontal)
                             {
-                                if (GemArray[bonus.Row, column] != null && !chain.Contains(GemArray[bonus.Row, column]))
+                                for (int column = 0; column < ColumnsNumber; column++)
                                 {
-                                    chain.Add(GemArray[bonus.Row, column]);
+                                    if (GemArray[bonus.Row, column] != null && !chain.Contains(GemArray[bonus.Row, column]))
+                                    {
+                                        chain.Add(GemArray[bonus.Row, column]);
+                                    }
+                                }
+                            }
+                            else
+                            {
+                                for (int row = 0; row < RowsNumber; row++)
+                                {
+                                    if (GemArray[row, bonus.Column] != null && !chain.Contains(GemArray[row, bonus.Column]))
+                                    {
+                                        chain.Add(GemArray[row, bonus.Column]);
+                                    }
                                 }
                             }
                         }
-                        else
-                        {
-                            for (int row = 0; row < RowsNumber; row++)
-                            {
-                                if (GemArray[row, bonus.Column] != null && !chain.Contains(GemArray[row, bonus.Column]))
-                                {
-                                    chain.Add(GemArray[row, bonus.Column]);
-                                }
-                            }
-                        }
-                    }
 
-                    if (bonus.IsABomb)
-                    {
-                        int i;
-                        int j;
-                        if (bonus.Row == 0)
+                        if (bonus.IsABomb)
                         {
-                            i = 0;
-                        }
-                        else
-                        {
-                            if (bonus.Row - Properties.BombBlastRadius < 0)
+                            int i;
+                            int j;
+                            if (bonus.Row == 0)
                             {
                                 i = 0;
-                            } else
-                            {
-                                i = bonus.Row - Properties.BombBlastRadius;
                             }
-                        }
-                        if (bonus.Column == 0)
-                        {
-                            j = 0;
-                        }
-                        else
-                        {
-                            if (bonus.Column - Properties.BombBlastRadius < 0)
+                            else
+                            {
+                                if (bonus.Row - Properties.BombBlastRadius < 0)
+                                {
+                                    i = 0;
+                                }
+                                else
+                                {
+                                    i = bonus.Row - Properties.BombBlastRadius;
+                                }
+                            }
+                            if (bonus.Column == 0)
                             {
                                 j = 0;
                             }
                             else
                             {
-                                j = bonus.Column - Properties.BombBlastRadius;
-                            }
-                        }
-
-                        for (int row = i; row <= bonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)
-                        {
-                            for (int column = j; column <= bonus.Column + Properties.BombBlastRadius && column <= ColumnsNumber - 1; column++)
-                            {
-                                if (GemArray[row, column] != null && !chain.Contains(GemArray[row, column]))
+                                if (bonus.Column - Properties.BombBlastRadius < 0)
                                 {
-                                    chain.Add(GemArray[row, column]);
+                                    j = 0;
+                                }
+                                else
+                                {
+                                    j = bonus.Column - Properties.BombBlastRadius;
+                                }
+                            }
+
+                            for (int row = i; row <= bonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)
+                            {
+                                for (int column = j; column <= bonus.Column + Properties.BombBlastRadius && column <= ColumnsNumber - 1; column++)
+                                {
+                                    if (GemArray[row, column] != null && !chain.Contains(GemArray[row, column]))
+                                    {
+                                        chain.Add(GemArray[row, column]);
+                                    }
                                 }
                             }
                         }
                     }
 
+                    needToReiterrate = bonuses.Count < chain.GetAllBonuses().Count;
                 }
 
                 // подсчитываем очки за цепочку, добавляем их к общему счету
@@ -521,7 +530,7 @@ namespace MatchThreeMore
         /// Заполнение пустых ячеек в массиве модели.
         /// </summary>
         /// <returns>Список новых камешков на обогащение спрайтами</returns>
-        public GemList FillBlanks ()
+        public GemList FillBlanks()
         {
             GemList newGems = new GemList();
             Random rnd = new Random();

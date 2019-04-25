@@ -33,6 +33,7 @@ namespace MatchThreeMore
 
         // Время раунда
         public const int LevelTime = 180;
+        public const int DevLevelTime = 10;
 
         // Радиус поражения бомбы
         public const int BombBlastRadius = 2;

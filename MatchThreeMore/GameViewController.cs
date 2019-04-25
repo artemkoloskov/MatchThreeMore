@@ -40,6 +40,11 @@ namespace MatchThreeMore
         {
             base.ViewDidLoad();
 
+            if (DevModeIsOn)
+            {
+                currentTime = DevLevelTime;
+            }
+
             // Configure the view.
             SKView skView = (SKView)View;
             skView.ShowsFPS = DevModeIsOn;
