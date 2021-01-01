@@ -1,3 +1,4 @@
+using AudioToolbox;
 using Foundation;
 using System;
 using UIKit;
@@ -9,7 +10,7 @@ namespace MatchThreeMore
 {
     public partial class GameOverViewController : UIViewController
     {
-        public GameOverViewController (IntPtr handle) : base (handle)
+        public GameOverViewController(IntPtr handle) : base(handle)
         {
         }
 
@@ -63,11 +64,34 @@ namespace MatchThreeMore
 
             View.Add(startButton);
 
-
-            startButton.TouchUpInside += (sender, e) => {
+            startButton.TouchUpInside += (sender, e) =>
+            {
                 UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
                 NavigationController.PushViewController(mainMenu, true);
             };
+
+            NSUrl url;
+
+            if (int.Parse(score.Text) >= 3500)
+            {
+                url = NSUrl.FromFilename("greatScoreRus.wav");
+            }
+            else if (int.Parse(score.Text) >= 2000 && int.Parse(score.Text) < 3500)
+            {
+                url = NSUrl.FromFilename("loserScoreRus.wav");
+            }
+            else if (int.Parse(score.Text) >= 500 && int.Parse(score.Text) < 2000)
+            {
+                url = NSUrl.FromFilename("antScoreRus.wav");
+            }
+            else
+            {
+                url = NSUrl.FromFilename("veryLowScoreRus.wav");
+            }
+
+            SystemSound ss = new SystemSound(url);
+
+            ss.PlayAlertSound();
         }
     }
 }

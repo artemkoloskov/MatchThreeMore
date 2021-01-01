@@ -47,7 +47,7 @@ namespace MatchThreeMore
             AnchorPoint = new CGPoint(0.5f, 0.5f);
 
             // Подсчитываем рамеры клетки с камешком. Клетки квадратные
-            gemCellWidth = ((float)Size.Width - Properties.GameFieldPadding * 2) / Level.ColumnsNumber;
+            gemCellWidth = ((float)Size.Width - (Properties.GameFieldPadding * 2)) / Level.ColumnsNumber;
             gemCellHeight = gemCellWidth;
 
             // Устанавливаем бэкграунд из текстуры

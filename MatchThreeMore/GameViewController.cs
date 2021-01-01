@@ -295,7 +295,7 @@ namespace MatchThreeMore
         /// Поведение таймера.
         /// </summary>
         /// <returns>Текущее время таймера.</returns>
-        private int TimerAction ()
+        private int TimerAction()
         {
             if (!scene.GameIsPaused)
             {
@@ -381,7 +381,7 @@ namespace MatchThreeMore
                 await Task.Delay(delay);
 
                 View.UserInteractionEnabled = true;
-            } 
+            }
             else
             {
                 scene.Animate(swap, swapIsValid);
@@ -397,7 +397,7 @@ namespace MatchThreeMore
         /// обработка падения камешков на уровне модели, проигрывание анимации 
         /// падения, заполнение модели и сцены новыми камешками
         /// </summary>
-        public async Task HandleChains ()
+        public async Task HandleChains()
         {
             // Сканирование массива до тех пор, пока в модели остаются цепочки, после уничтожения
             // и спуска камешков
