@@ -1,7 +1,7 @@
 ﻿
 using System;
 using System.Collections.Generic;
-
+using System.Linq;
 using CoreGraphics;
 using Foundation;
 using SpriteKit;
@@ -13,28 +13,31 @@ namespace MatchThreeMore
 
     public class GameScene : SKScene
     {
-        public Level Level { get; set; }
+        public Level Level
+        {
+            get; set;
+        }
         public Del SwipeHandler;
         public bool GameIsPaused;
 
-        private SKNode gameLayer = new SKNode();
-        private SKNode gemLayer = new SKNode();
-        private SKSpriteNode selectedSprite = new SKSpriteNode();
-        private SKSpriteNode background = new SKSpriteNode("background.jpg");
+        private SKNode _gameLayer = new SKNode();
+        private SKNode _gemLayer = new SKNode();
+        private SKSpriteNode _selectedSprite = new SKSpriteNode();
+        private SKSpriteNode _background = new SKSpriteNode("background.jpg");
 
-        private static readonly SKAction swapSound = SKAction.PlaySoundFileNamed("swap.wav", false);
-        private static readonly SKAction errorSound = SKAction.PlaySoundFileNamed("error.wav", false);
-        private static readonly SKAction dingSound = SKAction.PlaySoundFileNamed("ding.wav", false);
-        private static readonly SKAction destroySound = SKAction.PlaySoundFileNamed("destroyer.wav", false);
-        private static readonly SKAction newDestroyerSound = SKAction.PlaySoundFileNamed("new_destroyer.wav", false);
-        private static readonly SKAction explosionSound = SKAction.PlaySoundFileNamed("explosion.mp3", false);
-        private static readonly SKAction newBombSound = SKAction.PlaySoundFileNamed("new_bomb.mp3", false);
+        private static readonly SKAction _playSwapSound = SKAction.PlaySoundFileNamed("swap.wav", false);
+        private static readonly SKAction _playErrorSound = SKAction.PlaySoundFileNamed("error.wav", false);
+        private static readonly SKAction _playDingSound = SKAction.PlaySoundFileNamed("ding.wav", false);
+        private static readonly SKAction _playDestroySound = SKAction.PlaySoundFileNamed("destroyer.wav", false);
+        private static readonly SKAction _playNewDestroyerAppearedSound = SKAction.PlaySoundFileNamed("new_destroyer.wav", false);
+        private static readonly SKAction _playExplosionSound = SKAction.PlaySoundFileNamed("explosion.mp3", false);
+        private static readonly SKAction _playNewBombAppearedSound = SKAction.PlaySoundFileNamed("new_bomb.mp3", false);
 
-        private float gemCellHeight;
-        private float gemCellWidth;
-        private int swipeFromColumn;
-        private int swipeFromRow;
-        private bool swipeIsValid;
+        private float _gemCellHeight;
+        private float _gemCellWidth;
+        private int _swipeStartColumn;
+        private int _swipeStartRow;
+        private bool _swipeIsValid;
 
         protected GameScene(IntPtr handle) : base(handle)
         {
@@ -47,25 +50,12 @@ namespace MatchThreeMore
             AnchorPoint = new CGPoint(0.5f, 0.5f);
 
             // Подсчитываем рамеры клетки с камешком. Клетки квадратные
-            gemCellWidth = ((float)Size.Width - (Properties.GameFieldPadding * 2)) / Level.ColumnsNumber;
-            gemCellHeight = gemCellWidth;
+            _gemCellWidth = ((float)Size.Width - (Properties.GameFieldPadding * 2)) / Level.ColumnsNumber;
+            _gemCellHeight = _gemCellWidth;
 
-            // Устанавливаем бэкграунд из текстуры
-            background.Size = Size;
-            background.ZPosition = 1;
-            AddChild(background);
-
-            // добавляем на сцену основной нод игры, в который будут добавлены остальные элементы уровня
-            gameLayer.ZPosition = 2;
-            AddChild(gameLayer);
-
-            // Расчет позиции нода с камешками в зависиомсти от высоты и ширины клетки и колисчества клеток
-            CGPoint layerPosition = new CGPoint( - gemCellWidth * Level.ColumnsNumber / 2.0f, - gemCellHeight * Level.RowsNumber / 2.0f);
-
-            // добавляем в основной нод нод для камешков
-            gemLayer.Position = layerPosition;
-            gemLayer.ZPosition = 3;
-            gameLayer.AddChild(gemLayer);
+            AddBackground();
+            AddGameLayer();
+            AddGemLayer();
         }
 
         public override void TouchesBegan(NSSet touches, UIEvent evt)
@@ -74,21 +64,23 @@ namespace MatchThreeMore
             {
                 return;
             }
+
             // Определение валидности свайпа и столбца-ряда, с которого начинается свайп
             foreach (NSObject touch in touches)
             {
-                CGPoint location = ((UITouch)touch).LocationInNode(gemLayer);
+                CGPoint touchLocation = ((UITouch)touch).LocationInNode(_gemLayer);
 
-                (bool success, int column, int row) = GetRowAndColumnFromPosition(location);
+                (bool gotRowAndColumn, int touchedColumn, int touchedRow) =
+                    GetRowAndColumnFromLocation(touchLocation);
 
-                if (success)
+                if (gotRowAndColumn)
                 {
-                    swipeFromRow = row;
-                    swipeFromColumn = column;
-                    swipeIsValid = true;
+                    _swipeStartRow = touchedRow;
+                    _swipeStartColumn = touchedColumn;
+                    _swipeIsValid = true;
 
                     // Подсвечиваем выбранный камешек
-                    ShowSelectionIndicator(Level.GemArray[row, column]);
+                    ShowSelectionIndicator(Level.GemArray[touchedRow, touchedColumn]);
                 }
             }
         }
@@ -96,37 +88,28 @@ namespace MatchThreeMore
         public override void TouchesMoved(NSSet touches, UIEvent evt)
         {
             // определение направления свайпа
-            if (swipeIsValid && !GameIsPaused)
+            if (_swipeIsValid && !GameIsPaused)
             {
                 foreach (NSObject touch in touches)
                 {
-                    CGPoint location = ((UITouch)touch).LocationInNode(gemLayer);
+                    CGPoint touchLocation = ((UITouch)touch).LocationInNode(_gemLayer);
 
-                    (bool success, int column, int row) = GetRowAndColumnFromPosition(location);
+                    (bool gotRowAndColumn, int swipeEndColumn, int swipeEndRow) =
+                        GetRowAndColumnFromLocation(touchLocation);
 
-                    if (success)
+                    if (gotRowAndColumn)
                     {
-                        int horizontalDelta = 0;
-                        int verticalDelta = 0;
-
-                        if (column < swipeFromColumn)
-                        {
-                            horizontalDelta = -1;
-                        } else if (column > swipeFromColumn)
-                        {
-                            horizontalDelta = 1;
-                        } else if (row < swipeFromRow)
-                        {
-                            verticalDelta = -1;
-                        } else if (row > swipeFromRow)
-                        {
-                            verticalDelta = 1;
-                        }
+                        int horizontalDelta =
+                            GetDeltaDirection(_swipeStartColumn, swipeEndColumn);
+                        int verticalDelta =
+                            GetDeltaDirection(_swipeStartRow, swipeEndRow);
 
                         if (horizontalDelta != 0 || verticalDelta != 0)
                         {
                             TrySwap(horizontalDelta, verticalDelta);
-                            swipeIsValid = false;
+
+                            _swipeIsValid = false;
+
                             HideSelectionIndicator();
                         }
                     }
@@ -138,7 +121,7 @@ namespace MatchThreeMore
         public override void TouchesEnded(NSSet touches, UIEvent evt)
         {
             // когда прикосновение кончается снимаем подсветку камешка
-            if (selectedSprite.Parent != null && swipeIsValid && !GameIsPaused)
+            if (_selectedSprite.Parent != null && _swipeIsValid && !GameIsPaused)
             {
                 HideSelectionIndicator();
             }
@@ -149,96 +132,15 @@ namespace MatchThreeMore
             // Called before each frame is rendered
         }
 
-        //++++++++++ДОПОЛНИТЕЛЬНЫЙЕ МЕТОДЫ+++++++++++++
-
-        public void SwitchBacgroundZPosition ()
+        public void SwitchBacgroundZPosition()
         {
-            if (background.ZPosition == 1)
+            if (_background.ZPosition == 1)
             {
-                background.ZPosition = 150;
+                _background.ZPosition = 150;
             }
             else
             {
-                background.ZPosition = 1;
-            }
-        }
-
-        /// <summary>
-        /// Добававляем его спрайт на нод для камешка, с расчетом размера и позиции
-        /// </summary>
-        /// <param name="gem">Камешек которому добавляется спрайт.</param>
-        private void AttachSpriteTo (Gem gem)
-        {
-            SKSpriteNode sprite;
-
-            // Если разрушитель - открепляем старый спрайт на этом месте от слоя камешков
-            if ((gem.IsALineDestroyer || gem.IsABomb) && Level.GemArray[gem.Row, gem.Column] != null)
-            {
-                sprite = Level.GemArray[gem.Row, gem.Column].Sprite;
-
-                if (sprite != null && sprite.Parent != null)
-                {
-                    sprite.RemoveFromParent();
-                }
-
-            }
-
-            // подготовка спрайта
-            sprite = SKSpriteNode.FromImageNamed(gem.GetSpriteName());
-            sprite.Size = new CGSize(gemCellWidth, gemCellHeight);
-            sprite.Position = GetPositionFromRowAndColumn(gem.Row, gem.Column);
-            gemLayer.AddChild(sprite);
-
-            gem.Sprite = sprite;
-
-            // подготовка к анимации
-            sprite.Alpha = 0;
-            sprite.XScale = 0.5f;
-            sprite.YScale = 0.5f;
-
-            // Анимация появления камешка
-            sprite.RunAction(
-              SKAction.Sequence(
-                SKAction.WaitForDuration(0.25, 0.5),
-                SKAction.Group(
-                  SKAction.FadeInWithDuration(0.25),
-                  SKAction.ScaleTo(1.0f, 0.25)
-                )
-            ));
-
-            // если разрушитель - заменяем в массиве камешек
-            if (gem.IsALineDestroyer || gem.IsABomb)
-            {
-                Level.GemArray[gem.Row, gem.Column] = gem;
-            }
-        }
-
-        /// <summary>
-        /// Прикрепление спрайтов к камешкам в массиве
-        /// </summary>
-        /// <param name="gems">Двумерный массив камешков.</param>
-        public void AttachSpritesTo(Gem[,] gems)
-        {
-            // маркер появления на игровом поле разрушителя, для проигрывания 
-            // звука появления разрушителя
-            bool hasDestroyers = false;
-            bool hasBomb = false;
-
-            foreach (Gem gem in gems)
-            {
-                AttachSpriteTo (gem);
-
-                hasDestroyers |= gem.IsALineDestroyer;
-                hasBomb |= gem.IsABomb;
-            }
-
-            // проигрывам звук появления разрушителя
-            if (hasBomb)
-            {
-                RunAction (newBombSound);
-            } else if (hasDestroyers)
-            {
-                RunAction (newDestroyerSound);
+                _background.ZPosition = 1;
             }
         }
 
@@ -246,81 +148,33 @@ namespace MatchThreeMore
         /// Прикрепление спрайтов к камешкам в списке
         /// </summary>
         /// <param name="gems">Список камешков на обогащение спрайтами</param>
-        public void AttachSpritesTo(GemList gems)
+        public void AttachSpritesToGems(GemList gems)
+        {
+            foreach (Gem gem in gems)
+            {
+                AttachSpriteToGem(gem);
+            }
+        }
+
+        /// <summary>
+        /// Scan for bonuses and play new bonus (bomb or destroyer) announcements
+        /// </summary>
+        /// <param name="gems">List of gems to scan</param>
+        public void AnnounceBonusGems(GemList gems)
         {
             // маркер появления на игровом поле разрушителя, для проигрывания 
             // звука появления разрушителя
-            bool hasDestroyers = false;
-            bool hasBomb = false;
-
-            foreach (Gem gem in gems)
-            {
-                AttachSpriteTo (gem);
-
-                hasDestroyers |= gem.IsALineDestroyer;
-                hasBomb |= gem.IsABomb;
-            }
+            bool hasDestroyers = gems.Any(g => g.IsALineDestroyer);
+            bool hasBomb = gems.Any(g => g.IsABomb);
 
             // проигрывам звук появления разрушителя
             if (hasBomb)
             {
-                RunAction(newBombSound);
+                RunAction(_playNewBombAppearedSound);
             }
             else if (hasDestroyers)
             {
-                RunAction(newDestroyerSound);
-            }
-        }
-
-        /// <summary>
-        /// Расчет позиции камешка на сцене в зависимости от его положения в массиве камешков
-        /// </summary>
-        /// <returns>Точку на ноде</returns>
-        /// <param name="row">Ряд.</param>
-        /// <param name="column">Колонка.</param>
-        private CGPoint GetPositionFromRowAndColumn(int row, int column)
-        {
-            return new CGPoint(column * gemCellWidth + gemCellWidth / 2.0f, row * gemCellHeight + gemCellHeight / 2.0f);
-        }
-
-        /// <summary>
-        /// Расчет положения в массиве в зависимости от позиции на сцене
-        /// </summary>
-        /// <returns>Индикатор нахождения точки на одной из клеток игровго поля
-        /// и координаты клетки</returns>
-        /// <param name="point">Точка на игровом поле</param>
-        private (bool, int, int) GetRowAndColumnFromPosition (CGPoint point)
-        {
-            // Проверяем находится ли точка в рамках нода с камешками
-            if (point.X >= 0 && point.X < Level.ColumnsNumber * gemCellWidth * 1.0f &&
-                point.Y >= 0 && point.Y < Level.RowsNumber * gemCellHeight * 1.0f)
-            {
-                return (true, (int)(point.X / gemCellWidth), (int)(point.Y / gemCellHeight));
-            }
-
-            return (false, 0, 0);
-        }
-
-        /// <summary>
-        /// Попытка обмена местами камешков. Сначала подготавливает камешки для смены в класс Swap, 
-        /// затем передаем их делегату SwipeHandler, который обрабатывет смену на уровне модели и представления
-        /// </summary>
-        /// <param name="horizontalDelta">Смещение по горизонтали</param>
-        /// <param name="verticalDelta">Смещение по вертикали</param>
-        private void TrySwap (int horizontalDelta, int verticalDelta)
-        {
-            int toColumn = swipeFromColumn + horizontalDelta;
-            int toRow = swipeFromRow + verticalDelta;
-
-            if (toColumn >= 0 && toColumn < Level.ColumnsNumber ||
-                toRow >= 0 && toRow < Level.RowsNumber)
-            {
-                Gem fromGem = Level.GemArray[swipeFromRow, swipeFromColumn];
-                Gem toGem = Level.GemArray[toRow, toColumn];
-
-                Swap swap = new Swap(fromGem, toGem);
-
-                SwipeHandler(swap);
+                RunAction(_playNewDestroyerAppearedSound);
             }
         }
 
@@ -329,7 +183,7 @@ namespace MatchThreeMore
         /// </summary>
         /// <param name="swap">Объект с камешками на обмен</param>
         /// <param name="swapIsValid">Индикатор того, что своп возможен</param>
-        public void Animate(Swap swap, bool swapIsValid)
+        public void AnimateSwap(Swap swap, bool swapIsValid)
         {
             SKSpriteNode spriteA = swap.GemA.Sprite;
             SKSpriteNode spriteB = swap.GemB.Sprite;
@@ -352,7 +206,7 @@ namespace MatchThreeMore
                 spriteB.RunAction(moveB);
 
                 // Проигрываем звук обмена
-                RunAction(swapSound);
+                RunAction(_playSwapSound);
             }
             else
             {
@@ -360,7 +214,7 @@ namespace MatchThreeMore
                 spriteB.RunAction(SKAction.Sequence(moveB, moveA));
 
                 // Проигрываем звук ошибки
-                RunAction(errorSound);
+                RunAction(_playErrorSound);
             }
         }
 
@@ -368,7 +222,7 @@ namespace MatchThreeMore
         /// Анимация разрушения цепочек 
         /// </summary>
         /// <param name="chains">Список цепочек на разрушение.</param>
-        public void AnimateTheDstructionOf (List<GemList> chains)
+        public void AnimateDestructionOfChains(List<GemList> chains)
         {
             // маркер проверки на наличие в разрушенных цепочках разрушителя
             // если был разрушитель - звук разрушения будет другой
@@ -397,14 +251,234 @@ namespace MatchThreeMore
 
             if (hadBombs)
             {
-                RunAction(explosionSound);
-            } else if (hadDestroyers)
+                RunAction(_playExplosionSound);
+            }
+            else if (hadDestroyers)
             {
-                RunAction(destroySound);
+                RunAction(_playDestroySound);
             }
             else
             {
-                RunAction(dingSound);
+                RunAction(_playDingSound);
+            }
+        }
+
+        /// <summary>
+        /// Анимация разрушителей. создает спрайт, на месте бонуса, которому придает анимацию
+        /// перемещения к центру (зависит от активированного бонуса - вертикально
+        /// или горизонтально), с одновременным растягиванием, иммитируя лазерныйй луч
+        /// затем удаляет спрайт со сцены
+        /// </summary>
+        /// <param name="destroyer">Активированный бонус.</param>
+        public void AnimateLineDestroyer(Gem destroyer)
+        {
+            SKSpriteNode sprite;
+            CGPoint centerPoint;
+            SKAction resizeSprite;
+
+            // инициализация спрайта, подготовка координат для анимации, размеров
+            if (destroyer.IsHorizontal)
+            {
+                float newWidth = _gemCellWidth * Level.ColumnsNumber;
+
+                sprite = SKSpriteNode.FromImageNamed("destroyer_ray_horisontal");
+
+                centerPoint = new CGPoint(_gemCellWidth * Level.ColumnsNumber / 2, destroyer.Sprite.Position.Y);
+
+                resizeSprite = SKAction.ResizeToWidth(newWidth, Properties.LineDestructionDuration / 1000f);
+            }
+            else
+            {
+                float newHeight = _gemCellHeight * Level.RowsNumber;
+
+                sprite = SKSpriteNode.FromImageNamed("destroyer_ray_vertical");
+
+                centerPoint = new CGPoint(destroyer.Sprite.Position.X, _gemCellHeight * Level.RowsNumber / 2);
+
+                resizeSprite = SKAction.ResizeToHeight(newHeight, Properties.LineDestructionDuration / 1000f);
+            }
+
+            SKAction moveToCenter = SKAction.MoveTo(centerPoint, Properties.LineDestructionDuration / 1000f);
+
+            CGPoint initialPosition = GetPositionFromRowAndColumn(destroyer.Row, destroyer.Column);
+            CGSize initialSize = new CGSize(_gemCellWidth, _gemCellHeight);
+
+            sprite.Size = initialSize;
+            sprite.Position = initialPosition;
+            sprite.ZPosition = 110;
+
+            _gemLayer.AddChild(sprite);
+
+            sprite.RunAction(moveToCenter);
+            sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
+        }
+
+        /// <summary>
+        /// Анимация бонуса Бомба
+        /// </summary>
+        /// <param name="bomb">Бомба.</param>
+        public void AnimateBomb(Gem bomb)
+        {
+            CGSize initialSize = new CGSize(_gemCellWidth, _gemCellHeight);
+            CGSize newSize = new CGSize(_gemCellWidth * (Properties.BombBlastRadius * 2 + 1), _gemCellHeight * (Properties.BombBlastRadius * 2 + 1));
+            CGPoint initialPosition = GetPositionFromRowAndColumn(bomb.Row, bomb.Column);
+
+            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("bomb_blast");
+            sprite.Size = initialSize;
+            sprite.Position = initialPosition;
+            sprite.ZPosition = 110;
+
+            SKAction resizeSprite = SKAction.ResizeTo(newSize, Properties.LineDestructionDuration / 1000f);
+
+            _gemLayer.AddChild(sprite);
+
+            sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
+        }
+
+        /// <summary>
+        /// Изменение размера сцены
+        /// </summary>
+        /// <param name="size">Новый размер</param>
+        public void SetSize(CGSize size)
+        {
+            Size = size;
+        }
+
+        //++++++++++ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ+++++++++++++
+
+        private void AddGemLayer()
+        {
+            // Расчет позиции нода с камешками в зависиомсти от высоты и ширины клетки и колисчества клеток
+            CGPoint layerPosition = new CGPoint(-_gemCellWidth * Level.ColumnsNumber / 2.0f, -_gemCellHeight * Level.RowsNumber / 2.0f);
+
+            // добавляем в основной нод нод для камешков
+            _gemLayer.Position = layerPosition;
+            _gemLayer.ZPosition = 3;
+            _gameLayer.AddChild(_gemLayer);
+        }
+
+        private void AddGameLayer()
+        {
+            // добавляем на сцену основной нод игры, в который будут добавлены остальные элементы уровня
+            _gameLayer.ZPosition = 2;
+
+            AddChild(_gameLayer);
+        }
+
+        private void AddBackground()
+        {
+            // Устанавливаем бэкграунд из текстуры
+            _background.Size = Size;
+            _background.ZPosition = 1;
+
+            AddChild(_background);
+        }
+
+        private int GetDeltaDirection(int start, int end)
+        {
+            int delta = end - start;
+
+            return delta == 0 ? 0 : delta < 0 ? -1 : 1;
+        }
+
+        /// <summary>
+        /// Добававляем его спрайт на нод для камешка, с расчетом размера и позиции
+        /// </summary>
+        /// <param name="gem">Камешек которому добавляется спрайт.</param>
+        private void AttachSpriteToGem(Gem gem)
+        {
+            SKSpriteNode sprite;
+
+            // Если разрушитель - открепляем старый спрайт на этом месте от слоя камешков
+            if ((gem.IsALineDestroyer || gem.IsABomb) && Level.GemArray[gem.Row, gem.Column] != null)
+            {
+                sprite = Level.GemArray[gem.Row, gem.Column].Sprite;
+
+                if (sprite != null && sprite.Parent != null)
+                {
+                    sprite.RemoveFromParent();
+                }
+            }
+
+            // подготовка спрайта
+            sprite = SKSpriteNode.FromImageNamed(gem.GetSpriteName());
+            sprite.Size = new CGSize(_gemCellWidth, _gemCellHeight);
+            sprite.Position = GetPositionFromRowAndColumn(gem.Row, gem.Column);
+            _gemLayer.AddChild(sprite);
+
+            gem.Sprite = sprite;
+
+            // подготовка к анимации
+            sprite.Alpha = 0;
+            sprite.XScale = 0.5f;
+            sprite.YScale = 0.5f;
+
+            // Анимация появления камешка
+            sprite.RunAction(
+              SKAction.Sequence(
+                SKAction.WaitForDuration(0.25, 0.5),
+                SKAction.Group(
+                  SKAction.FadeInWithDuration(0.25),
+                  SKAction.ScaleTo(1.0f, 0.25)
+                )
+            ));
+
+            // если разрушитель - заменяем в массиве камешек
+            if (gem.IsALineDestroyer || gem.IsABomb)
+            {
+                Level.GemArray[gem.Row, gem.Column] = gem;
+            }
+        }
+
+        /// <summary>
+        /// Расчет позиции камешка на сцене в зависимости от его положения в массиве камешков
+        /// </summary>
+        /// <returns>Точку на ноде</returns>
+        /// <param name="row">Ряд.</param>
+        /// <param name="column">Колонка.</param>
+        private CGPoint GetPositionFromRowAndColumn(int row, int column)
+        {
+            return new CGPoint(column * _gemCellWidth + _gemCellWidth / 2.0f, row * _gemCellHeight + _gemCellHeight / 2.0f);
+        }
+
+        /// <summary>
+        /// Расчет положения в массиве в зависимости от позиции на сцене
+        /// </summary>
+        /// <returns>Индикатор нахождения точки на одной из клеток игровго поля
+        /// и координаты клетки</returns>
+        /// <param name="point">Точка на игровом поле</param>
+        private (bool, int, int) GetRowAndColumnFromLocation(CGPoint point)
+        {
+            // Проверяем находится ли точка в рамках нода с камешками
+            if (point.X >= 0 && point.X < Level.ColumnsNumber * _gemCellWidth * 1.0f &&
+                point.Y >= 0 && point.Y < Level.RowsNumber * _gemCellHeight * 1.0f)
+            {
+                return (true, (int)(point.X / _gemCellWidth), (int)(point.Y / _gemCellHeight));
+            }
+
+            return (false, 0, 0);
+        }
+
+        /// <summary>
+        /// Попытка обмена местами камешков. Сначала подготавливает камешки для смены в класс Swap, 
+        /// затем передаем их делегату SwipeHandler, который обрабатывет смену на уровне модели и представления
+        /// </summary>
+        /// <param name="horizontalDelta">Смещение по горизонтали</param>
+        /// <param name="verticalDelta">Смещение по вертикали</param>
+        private void TrySwap(int horizontalDelta, int verticalDelta)
+        {
+            int toColumn = _swipeStartColumn + horizontalDelta;
+            int toRow = _swipeStartRow + verticalDelta;
+
+            if (toColumn >= 0 && toColumn < Level.ColumnsNumber ||
+                toRow >= 0 && toRow < Level.RowsNumber)
+            {
+                Gem fromGem = Level.GemArray[_swipeStartRow, _swipeStartColumn];
+                Gem toGem = Level.GemArray[toRow, toColumn];
+
+                Swap swap = new Swap(fromGem, toGem);
+
+                SwipeHandler(swap);
             }
         }
 
@@ -429,10 +503,9 @@ namespace MatchThreeMore
                 ZPosition = 300
             };
 
-            gemLayer.AddChild(scoreLabel);
+            _gemLayer.AddChild(scoreLabel);
 
             SKAction moveAction = SKAction.MoveBy(0, 3, 0.7);
-            //.Move(by: CGVector(dx: 0, dy: 3), duration: 0.7)
             moveAction.TimingMode = SKActionTimingMode.EaseOut;
             scoreLabel.RunAction(SKAction.Sequence(moveAction, SKAction.RemoveFromParent()));
         }
@@ -441,7 +514,7 @@ namespace MatchThreeMore
         /// Анимация падения камешков на пустые места
         /// </summary>
         /// <param name="gemLists">Списки камешков перемещенных в модели, столбцами</param>
-        public void AnimateFallingGemsIn (List<GemList> gemLists)
+        public void AnimateFallingGems(List<GemList> gemLists)
         {
             foreach (GemList gems in gemLists)
             {
@@ -454,7 +527,7 @@ namespace MatchThreeMore
                     action.TimingMode = SKActionTimingMode.EaseOut;
 
                     sprite.RunAction(action);
-               }
+                }
             }
         }
 
@@ -465,20 +538,20 @@ namespace MatchThreeMore
         private void ShowSelectionIndicator(Gem gem)
         {
             // Открепляем спрайт от родителя, если он есть
-            if (selectedSprite.Parent != null)
+            if (_selectedSprite.Parent != null)
             {
-                selectedSprite.RemoveFromParent();
+                _selectedSprite.RemoveFromParent();
             }
 
             SKSpriteNode sprite = gem.Sprite;
             SKTexture texture = SKTexture.FromImageNamed(gem.GetSelectedSpriteName());
 
-            selectedSprite.Size = new CGSize(gemCellWidth, gemCellHeight);
-            selectedSprite.RunAction(SKAction.SetTexture(texture));
+            _selectedSprite.Size = new CGSize(_gemCellWidth, _gemCellHeight);
+            _selectedSprite.RunAction(SKAction.SetTexture(texture));
 
             // "Подсветка" добавляется в качестве потомка к основному спрайту камешка
-            sprite.AddChild(selectedSprite);
-            selectedSprite.Alpha = 1.0f;
+            sprite.AddChild(_selectedSprite);
+            _selectedSprite.Alpha = 1.0f;
         }
 
         /// <summary>
@@ -487,89 +560,10 @@ namespace MatchThreeMore
         private void HideSelectionIndicator()
         {
             // открепляем спрайт "подсветки" 
-            selectedSprite.RunAction(SKAction.Sequence(SKAction.FadeOutWithDuration(Properties.SelectedGemTextureFadeDuration/1000f), SKAction.RemoveFromParent()));
+            _selectedSprite.RunAction(
+                SKAction.Sequence(
+                    SKAction.FadeOutWithDuration(Properties.SelectedGemTextureFadeDuration / 1000f),
+                    SKAction.RemoveFromParent()));
         }
-
-        /// <summary>
-        /// Анимация разрушителей. создает спрайт, на месте бонуса, которому придает анимацию
-        /// перемещения к центру (зависит от активированного бонуса - вертикально
-        /// или горизонтально), с одновременным растягиванием, иммитируя лазерныйй луч
-        /// затем удаляет спрайт со сцены
-        /// </summary>
-        /// <param name="destroyer">Активированный онус.</param>
-        public void AnimateLineDestroyer (Gem destroyer)
-        {
-            SKSpriteNode sprite;
-            CGPoint centerPoint;
-            SKAction resizeSprite;
-
-            // инициализация спрайта, подготовка координат для анимации, размеров
-            if (destroyer.IsHorizontal)
-            {
-                float newWidth = gemCellWidth * Level.ColumnsNumber;
-
-                sprite = SKSpriteNode.FromImageNamed("destroyer_ray_horisontal");
-
-                centerPoint = new CGPoint(gemCellWidth * Level.ColumnsNumber / 2, destroyer.Sprite.Position.Y);
-
-                resizeSprite = SKAction.ResizeToWidth(newWidth, Properties.LineDestructionDuration / 1000f);
-            }
-            else
-            {
-                float newHeight = gemCellHeight * Level.RowsNumber;
-
-                sprite = SKSpriteNode.FromImageNamed("destroyer_ray_vertical");
-
-                centerPoint = new CGPoint(destroyer.Sprite.Position.X, gemCellHeight * Level.RowsNumber / 2);
-
-                resizeSprite = SKAction.ResizeToHeight(newHeight, Properties.LineDestructionDuration / 1000f);
-            }
-
-            SKAction moveToCenter = SKAction.MoveTo(centerPoint, Properties.LineDestructionDuration / 1000f);
-
-            CGPoint initialPosition = GetPositionFromRowAndColumn(destroyer.Row, destroyer.Column);
-            CGSize initialSize = new CGSize(gemCellWidth, gemCellHeight);
-
-            sprite.Size = initialSize;
-            sprite.Position = initialPosition;
-            sprite.ZPosition = 110;
-
-            gemLayer.AddChild(sprite);
-
-            sprite.RunAction(moveToCenter);
-            sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
-        }
-
-        /// <summary>
-        /// Анимация бонуса Бомба
-        /// </summary>
-        /// <param name="bomb">Бомба.</param>
-        public void AnimateBomb(Gem bomb)
-        {
-            CGSize initialSize = new CGSize(gemCellWidth, gemCellHeight);
-            CGSize newSize = new CGSize(gemCellWidth * (Properties.BombBlastRadius * 2 + 1), gemCellHeight * (Properties.BombBlastRadius * 2 + 1));
-            CGPoint initialPosition = GetPositionFromRowAndColumn(bomb.Row, bomb.Column);
-
-            SKSpriteNode sprite = SKSpriteNode.FromImageNamed("bomb_blast");
-            sprite.Size = initialSize;
-            sprite.Position = initialPosition;
-            sprite.ZPosition = 110;
-
-            SKAction resizeSprite = SKAction.ResizeTo(newSize, Properties.LineDestructionDuration / 1000f);
-
-            gemLayer.AddChild(sprite);
-
-            sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
-        }
-
-        /// <summary>
-        /// Изменение размера сцены
-        /// </summary>
-        /// <param name="size">Новый размер</param>
-        public void SetSize(CGSize size)
-        {
-            Size = size;
-        }
-
     }
 }

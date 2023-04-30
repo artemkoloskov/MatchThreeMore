@@ -8,17 +8,36 @@ namespace MatchThreeMore
     /// </summary>
     public class Level
     {
-        public Gem[,] GemArray { get; set; }
+        public Gem[,] GemArray
+        {
+            get; set;
+        }
         public GemList BonusesToAnimate { get; set; } = new GemList();
         public GemList BonusesToAddSpritesTo { get; set; } = new GemList();
+        public GemList GemList => new GemList(GemArray);
         public List<GemList> DestroyedChains { get; set; } = new List<GemList>();
         public List<Swap> Swaps { get; set; } = new List<Swap>();
-        public int Score { get; set; }
+        public int Score
+        {
+            get; set;
+        }
 
-        public int RowsNumber { get; }
-        public int ColumnsNumber { get; }
-        public bool DevModeIsOn { get; }
-        public LevelData LevelData { get; }
+        public int RowsNumber
+        {
+            get;
+        }
+        public int ColumnsNumber
+        {
+            get;
+        }
+        public bool DevModeIsOn
+        {
+            get;
+        }
+        public LevelData LevelData
+        {
+            get;
+        }
 
         /// <summary>
         /// Конструктор класса <see cref="T:MatchThreeMore.Level"/>.
@@ -175,7 +194,10 @@ namespace MatchThreeMore
             }
 
             // ________ДЛЯ ДЕБАГА_______
-            foreach (Swap swap in Swaps) { Console.Write(swap + "\n"); }
+            foreach (Swap swap in Swaps)
+            {
+                Console.Write(swap + "\n");
+            }
         }
 
         /// <summary>
@@ -272,15 +294,15 @@ namespace MatchThreeMore
         /// <param name="gemColumn">Колонка</param>
         private GemList GetChainAt(int gemRow, int gemColumn)
         {
-            GemList possibleChain = new GemList();
+            GemList possibleHorizontalChain = new GemList();
 
             // Если камешка в данной позиции вообще нет - возвращаем пустой список
             if (GemArray[gemRow, gemColumn] == null)
             {
-                return possibleChain;
+                return possibleHorizontalChain;
             }
 
-            possibleChain.Add(GemArray[gemRow, gemColumn]);
+            possibleHorizontalChain.Add(GemArray[gemRow, gemColumn]);
 
             GemType gemTypeToCheck = GemArray[gemRow, gemColumn].GemType;
 
@@ -292,7 +314,7 @@ namespace MatchThreeMore
             {
                 if (GemArray[gemRow, column] != null && gemTypeToCheck == GemArray[gemRow, column].GemType)
                 {
-                    possibleChain.Add(GemArray[gemRow, column]);
+                    possibleHorizontalChain.Add(GemArray[gemRow, column]);
                 }
                 else
                 {
@@ -307,7 +329,7 @@ namespace MatchThreeMore
             {
                 if (GemArray[gemRow, column] != null && gemTypeToCheck == GemArray[gemRow, column].GemType)
                 {
-                    possibleChain.Add(GemArray[gemRow, column]);
+                    possibleHorizontalChain.Add(GemArray[gemRow, column]);
                 }
                 else
                 {
@@ -315,15 +337,9 @@ namespace MatchThreeMore
                 }
             }
 
-            // Если в цепочке три и более элементов - цепочка возвращается
-            if (possibleChain.Count >= 3)
-            {
-                return possibleChain;
-            }
-
             // Сбрасываем цепочку, если не нашлось цепочки по горизонтали
-            possibleChain.Clear();
-            possibleChain.Add(GemArray[gemRow, gemColumn]);
+            GemList possibleVerticalChain = new GemList();
+            possibleVerticalChain.Add(GemArray[gemRow, gemColumn]);
 
             chainIsNotBroken = true;
 
@@ -332,7 +348,7 @@ namespace MatchThreeMore
             {
                 if (GemArray[row, gemColumn] != null && gemTypeToCheck == GemArray[row, gemColumn].GemType)
                 {
-                    possibleChain.Add(GemArray[row, gemColumn]);
+                    possibleVerticalChain.Add(GemArray[row, gemColumn]);
                 }
                 else
                 {
@@ -347,7 +363,7 @@ namespace MatchThreeMore
             {
                 if (GemArray[row, gemColumn] != null && gemTypeToCheck == GemArray[row, gemColumn].GemType)
                 {
-                    possibleChain.Add(GemArray[row, gemColumn]);
+                    possibleVerticalChain.Add(GemArray[row, gemColumn]);
                 }
                 else
                 {
@@ -355,7 +371,17 @@ namespace MatchThreeMore
                 }
             }
 
-            return possibleChain;
+            if (possibleHorizontalChain.Count >= 3 && possibleVerticalChain.Count >= 3)
+            {
+                possibleHorizontalChain.AddRange(possibleVerticalChain);
+            }
+
+            if (possibleHorizontalChain.Count >= 3)
+            {
+                return possibleHorizontalChain;
+            }
+
+            return possibleVerticalChain;
         }
 
         /// <summary>

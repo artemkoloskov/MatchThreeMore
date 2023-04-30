@@ -13,7 +13,10 @@ namespace MatchThreeMore
 {
     public partial class GameViewController : UIViewController
     {
-        public bool DevModeIsOn { get; set; }
+        public bool DevModeIsOn
+        {
+            get; set;
+        }
 
         private Level level;
         private GameScene scene;
@@ -338,7 +341,7 @@ namespace MatchThreeMore
         private void ShuffleGems()
         {
             level.Shuffle();
-            scene.AttachSpritesTo(level.GemArray);
+            scene.AttachSpritesToGems(level.GemList);
         }
 
         /// <summary>
@@ -362,7 +365,7 @@ namespace MatchThreeMore
                 level.Perform(swap);
 
                 // анимируем обмен на сцене
-                scene.Animate(swap, swapIsValid);
+                scene.AnimateSwap(swap, swapIsValid);
                 await Task.Delay(SwapAnimationDuration);
 
                 // обрабатываем полученные цепочки
@@ -384,7 +387,7 @@ namespace MatchThreeMore
             }
             else
             {
-                scene.Animate(swap, swapIsValid);
+                scene.AnimateSwap(swap, swapIsValid);
 
                 await Task.Delay(SwapAnimationDuration * 2);
 
@@ -418,7 +421,7 @@ namespace MatchThreeMore
 
                             scene.AnimateLineDestroyer(gem);
 
-                            scene.AnimateTheDstructionOf(level.DestroyedChains);
+                            scene.AnimateDestructionOfChains(level.DestroyedChains);
 
                             level.DestroyedChains.Clear();
 
@@ -431,7 +434,7 @@ namespace MatchThreeMore
 
                             scene.AnimateBomb(gem);
 
-                            scene.AnimateTheDstructionOf(level.DestroyedChains);
+                            scene.AnimateDestructionOfChains(level.DestroyedChains);
 
                             level.DestroyedChains.Clear();
 
@@ -445,7 +448,7 @@ namespace MatchThreeMore
                 else
                 {
                     // бонусов нет, обычное удаление цепочек
-                    scene.AnimateTheDstructionOf(level.DestroyedChains);
+                    scene.AnimateDestructionOfChains(level.DestroyedChains);
 
                     level.DestroyedChains.Clear();
 
@@ -453,7 +456,7 @@ namespace MatchThreeMore
                 }
 
                 // анимируем падение камешков
-                scene.AnimateFallingGemsIn(level.DropGems());
+                scene.AnimateFallingGems(level.DropGems());
                 await Task.Delay(FallAnimationDuration);
 
             }
@@ -463,10 +466,10 @@ namespace MatchThreeMore
             highScoreLabel.Text = "Лучший счет: " + Math.Max(level.Score, highScore) + "";
 
             // вызываем метод заполнения пустот в модели, создаем для них спрайты
-            scene.AttachSpritesTo(level.FillBlanks());
+            scene.AttachSpritesToGems(level.FillBlanks());
 
             // создаем спрайты для новых бонусов
-            scene.AttachSpritesTo(level.BonusesToAddSpritesTo);
+            scene.AttachSpritesToGems(level.BonusesToAddSpritesTo);
 
             // очищаем списки обработанных бонусов
             level.BonusesToAddSpritesTo.Clear();

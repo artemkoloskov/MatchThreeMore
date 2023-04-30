@@ -5,8 +5,21 @@ namespace MatchThreeMore
     /// <summary>
     /// Класс для облегчения чтения кода
     /// </summary>
-    public class GemList: List <Gem>
+    public class GemList : List<Gem>
     {
+        public GemList()
+        {
+
+        }
+
+        public GemList(Gem[,] gems)
+        {
+            foreach (var gem in gems)
+            {
+                this.Add(gem);
+            }
+        }
+
         /// <summary>
         /// Проверяет цепочку на наличие в ней бонуса, возвращает бонус.
         /// </summary>
@@ -16,7 +29,7 @@ namespace MatchThreeMore
             foreach (Gem gem in this)
             {
                 if (gem.IsALineDestroyer || gem.IsABomb)
-                { 
+                {
                     return gem;
                 }
             }
@@ -28,7 +41,7 @@ namespace MatchThreeMore
         /// Проверяет цепочку на наличие бонусов и возвращает список бонусов
         /// </summary>
         /// <returns>Список бонусов из цепочки.</returns>
-        public GemList GetAllBonuses ()
+        public GemList GetAllBonuses()
         {
             GemList bonuses = new GemList();
 
@@ -58,7 +71,7 @@ namespace MatchThreeMore
         /// </summary>
         /// <returns>Содержит/не содержит</returns>
         /// <param name="gem">Заданный камешек.</param>
-        public new bool Contains (Gem gem)
+        public new bool Contains(Gem gem)
         {
             foreach (Gem g in this)
             {
