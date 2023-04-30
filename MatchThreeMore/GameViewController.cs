@@ -285,7 +285,7 @@ namespace MatchThreeMore
                     GameOverViewController gameOver = Storyboard.InstantiateViewController("GameOver") as GameOverViewController;
 
                     // Передаем счет игры экрану конца игры
-                    gameOver.score.Text = scoreLabel.Text;
+                    gameOver.ScoreLabel.Text = scoreLabel.Text;
                     NavigationController.PushViewController(gameOver, true);
                 }
             });
