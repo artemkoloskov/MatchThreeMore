@@ -1,7 +1,4 @@
-﻿using System.Collections.Generic;
-using System.Linq;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 /// <summary>
 /// Класс для облегчения чтения кода
@@ -68,7 +65,7 @@ public class GemList : List<Gem>
     }
 
     /// <summary>
-    /// Проеверка на наличие в списке заданного камешка
+    /// Проверка на наличие в списке заданного камешка
     /// </summary>
     /// <returns>Содержит/не содержит</returns>
     /// <param name="gem">Заданный камешек.</param>

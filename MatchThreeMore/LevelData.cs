@@ -1,6 +1,4 @@
-﻿using System.IO;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 public class LevelData
 {

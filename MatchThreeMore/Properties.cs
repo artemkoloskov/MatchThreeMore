@@ -1,8 +1,4 @@
-﻿using System;
-using CoreGraphics;
-using UIKit;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 /// <summary>
 /// Класс с основными параметрами игры
@@ -13,7 +9,7 @@ public static class Properties
     public const int LevelColumns = 8;
     public const int LevelRows = 8;
 
-    // Отсуп игрового поля от края экрана слева и справа
+    // Отступ игрового поля от края экрана слева и справа
     public const int GameFieldPadding = 15;
 
     // Время анимации обмена камешков

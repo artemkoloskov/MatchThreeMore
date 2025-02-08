@@ -1,11 +1,4 @@
-﻿
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using CoreGraphics;
-using Foundation;
-using SpriteKit;
-using UIKit;
+﻿using SpriteKit;
 
 namespace MatchThreeMore;
 
@@ -49,7 +42,7 @@ public class GameScene : SKScene
         // Якорь на середину сцены
         AnchorPoint = new CGPoint(0.5f, 0.5f);
 
-        // Подсчитываем рамеры клетки с камешком. Клетки квадратные
+        // Подсчитываем размеры клетки с камешком. Клетки квадратные
         _gemCellWidth = ((float)Size.Width - (Properties.GameFieldPadding * 2)) / Level.ColumnsNumber;
         _gemCellHeight = _gemCellWidth;
 
@@ -132,7 +125,7 @@ public class GameScene : SKScene
         // Called before each frame is rendered
     }
 
-    public void SwitchBacgroundZPosition()
+    public void SwitchBackgroundZPosition()
     {
         if (_background.ZPosition == 1)
         {
@@ -167,7 +160,7 @@ public class GameScene : SKScene
         bool hasDestroyers = gems.Any(g => g.IsALineDestroyer);
         bool hasBomb = gems.Any(g => g.IsABomb);
 
-        // проигрывам звук появления разрушителя
+        // проигрываем звук появления разрушителя
         if (hasBomb)
         {
             RunAction(_playNewBombAppearedSound);
@@ -239,8 +232,8 @@ public class GameScene : SKScene
             foreach (Gem gem in chain)
             {
                 SKSpriteNode sprite = gem.Sprite;
-                SKAction sprtieAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
-                sprite.RunAction(SKAction.Sequence(sprtieAction, SKAction.RemoveFromParent()));
+                SKAction spriteAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
+                sprite.RunAction(SKAction.Sequence(spriteAction, SKAction.RemoveFromParent()));
 
                 AnimateScore(chain);
 
@@ -266,7 +259,7 @@ public class GameScene : SKScene
     /// <summary>
     /// Анимация разрушителей. создает спрайт, на месте бонуса, которому придает анимацию
     /// перемещения к центру (зависит от активированного бонуса - вертикально
-    /// или горизонтально), с одновременным растягиванием, иммитируя лазерныйй луч
+    /// или горизонтально), с одновременным растягиванием, имитируя лазерный луч
     /// затем удаляет спрайт со сцены
     /// </summary>
     /// <param name="destroyer">Активированный бонус.</param>
@@ -348,7 +341,7 @@ public class GameScene : SKScene
 
     private void AddGemLayer()
     {
-        // Расчет позиции нода с камешками в зависиомсти от высоты и ширины клетки и колисчества клеток
+        // Расчет позиции нода с камешками в зависимости от высоты и ширины клетки и количества клеток
         CGPoint layerPosition = new(-_gemCellWidth * Level.ColumnsNumber / 2.0f, -_gemCellHeight * Level.RowsNumber / 2.0f);
 
         // добавляем в основной нод нод для камешков
@@ -382,7 +375,7 @@ public class GameScene : SKScene
     }
 
     /// <summary>
-    /// Добававляем его спрайт на нод для камешка, с расчетом размера и позиции
+    /// Добавляем его спрайт на нод для камешка, с расчетом размера и позиции
     /// </summary>
     /// <param name="gem">Камешек которому добавляется спрайт.</param>
     private void AttachSpriteToGem(Gem gem)
@@ -433,7 +426,7 @@ public class GameScene : SKScene
     /// <summary>
     /// Расчет позиции камешка на сцене в зависимости от его положения в массиве камешков
     /// </summary>
-    /// <returns>Точку на ноде</returns>
+    /// <returns>Точку внутри ноды</returns>
     /// <param name="row">Ряд.</param>
     /// <param name="column">Колонка.</param>
     private CGPoint GetPositionFromRowAndColumn(int row, int column)
@@ -444,7 +437,7 @@ public class GameScene : SKScene
     /// <summary>
     /// Расчет положения в массиве в зависимости от позиции на сцене
     /// </summary>
-    /// <returns>Индикатор нахождения точки на одной из клеток игровго поля
+    /// <returns>Индикатор нахождения точки на одной из клеток игрового поля
     /// и координаты клетки</returns>
     /// <param name="point">Точка на игровом поле</param>
     private (bool, int, int) GetRowAndColumnFromLocation(CGPoint point)
@@ -461,7 +454,7 @@ public class GameScene : SKScene
 
     /// <summary>
     /// Попытка обмена местами камешков. Сначала подготавливает камешки для смены в класс Swap, 
-    /// затем передаем их делегату SwipeHandler, который обрабатывет смену на уровне модели и представления
+    /// затем передаем их делегату SwipeHandler, который обрабатывает смену на уровне модели и представления
     /// </summary>
     /// <param name="horizontalDelta">Смещение по горизонтали</param>
     /// <param name="verticalDelta">Смещение по вертикали</param>
@@ -534,7 +527,7 @@ public class GameScene : SKScene
     /// <summary>
     /// Подсвечивание выбранного камешка заменой текстуры в спрайте
     /// </summary>
-    /// <param name="gem">Камешек на подстветку.</param>
+    /// <param name="gem">Камешек на подсветку.</param>
     private void ShowSelectionIndicator(Gem gem)
     {
         // Открепляем спрайт от родителя, если он есть

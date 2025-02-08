@@ -1,28 +1,17 @@
-using CoreGraphics;
-using Foundation;
-using SpriteKit;
-using System;
-using System.IO;
-using UIKit;
-
 using static MatchThreeMore.AdditionalMethods;
 using static MatchThreeMore.Properties;
 
 namespace MatchThreeMore;
 
-public partial class MainMenuViewController : UIViewController
+public partial class MainMenuViewController(IntPtr handle) : UIViewController(handle)
 {
     private readonly string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
     public static bool IsDebugRelease =>
         #if DEBUG
             true;
-        #else
-            false;
-        #endif
 
-    public MainMenuViewController (IntPtr handle) : base (handle)
-    {
-    }
+#else
+#endif
 
 
 
@@ -109,7 +98,7 @@ public partial class MainMenuViewController : UIViewController
             Console.Write("File " + highScoresFileName + " not found. \n" + e);
         }
 
-        // парсим счет из строки загруженрной из файла
+        // парсим счет из строки загруженной из файла
         string[] line = highScoreText.Split(',');
 
         if (line.GetLength(0) != 1)

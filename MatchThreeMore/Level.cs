@@ -1,7 +1,4 @@
-﻿using System;
-using System.Collections.Generic;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 /// <summary>
 /// Класс игрового уровня. Отвечает создание, перемешивание, хранение массива камешков
@@ -95,7 +92,7 @@ public class Level
             return;
         }
 
-        // Рандомное заполнение уровня, если игра в обычном режиме
+        // Случайное заполнение уровня, если игра в обычном режиме
         Random rnd = new();
 
         for (int row = 0; row < RowsNumber; row++)
@@ -222,8 +219,8 @@ public class Level
 
         GemList chain = GetChainAt(rowB, columnB);
 
-        // проверяем получившюся цепоку на длину. если цепочка больше трех на
-        // месте премещенного камешка ставим бонус
+        // проверяем получившуюся цепочку на длину. если цепочка больше трех на
+        // месте перемещенного камешка ставим бонус
         // записываем бонус в список на добавление спрайтов для сцены
         if (chain.Count == 4)
         {
@@ -306,7 +303,7 @@ public class Level
 
         GemType gemTypeToCheck = GemArray[gemRow, gemColumn].GemType;
 
-        // Флаг разпыва цепочки
+        // Флаг разрыва цепочки
         bool chainIsNotBroken = true;
 
         //Проверка влево
@@ -387,7 +384,7 @@ public class Level
     /// Сканирование на наличие цепочки
     /// </summary>
     /// <returns><c>true</c>, если цепочка найдена, <c>false</c> если не найдена.</returns>
-    public GemList RetriveChain()
+    public GemList RetrieveChain()
     {
         for (int row = 0; row < RowsNumber; row++)
         {
@@ -404,7 +401,7 @@ public class Level
         return null;
     }
 
-    public List<GemList> RetriveAllChainsOnLevel()
+    public List<GemList> RetrieveAllChainsOnLevel()
     {
         List<GemList> chains = [];
 
@@ -434,17 +431,17 @@ public class Level
     /// <returns><c>true</c> если нашелся хотя бы один активируемый бонус</returns>
     public void DestroyChains()
     {
-        GemList chain = RetriveChain();
+        GemList chain = RetrieveChain();
 
         // Повторяем процесс пока находим цепочку на уровне
         while (chain != null)
         {
             GemList bonuses;
-            bool needToReiterrate = true;
+            bool needToReiterate = true;
 
-            while (needToReiterrate)
+            while (needToReiterate)
             {
-                needToReiterrate = false;
+                needToReiterate = false;
 
                 bonuses = chain.GetAllBonuses();
 
@@ -456,8 +453,8 @@ public class Level
                         BonusesToAnimate.Add(bonus);
                     }
 
-                    // Заносим в цепочку весь ряд илил столбец, 
-                    // в зависимости от напрваленности разрушителя
+                    // Заносим в цепочку весь ряд или столбец, 
+                    // в зависимости от направленности разрушителя
                     if (bonus.IsALineDestroyer)
                     {
                         if (bonus.IsHorizontal)
@@ -530,7 +527,7 @@ public class Level
                     }
                 }
 
-                needToReiterrate = bonuses.Count < chain.GetAllBonuses().Count;
+                needToReiterate = bonuses.Count < chain.GetAllBonuses().Count;
             }
 
             // подсчитываем очки за цепочку, добавляем их к общему счету
@@ -544,7 +541,7 @@ public class Level
             chain.ForEach(gem => GemArray[gem.Row, gem.Column] = null);
 
             // Получаем новую цепочку
-            chain = RetriveChain();
+            chain = RetrieveChain();
         }
 
         //______ДЛЯ ДЕБАГА______
@@ -566,17 +563,17 @@ public class Level
             {
                 if (GemArray[row, column] == null)
                 {
-                    bool foundApropriateGemType = false;
+                    bool foundAppropriateGemType = false;
 
                     // Создаем камешек, записываем его в массив, проверяем не создал ли он цепочку
                     // если создал - повторяем до те пор, пока не найдем камешек, который не создаст цепочку
-                    while (!foundApropriateGemType)
+                    while (!foundAppropriateGemType)
                     {
                         GemType newGemType = (GemType)rnd.Next(Enum.GetNames(typeof(GemType)).Length);
 
                         GemArray[row, column] = new Gem(newGemType, row, column);
 
-                        foundApropriateGemType = GetChainAt(row, column).Count < 3;
+                        foundAppropriateGemType = GetChainAt(row, column).Count < 3;
                     }
 
                     // Добавляем новый камешек в список камешков, которым позже добавят спрайты
@@ -593,8 +590,8 @@ public class Level
 
     /// <summary>
     /// Падение камешков на пустые места. Сканирует колонку на пустоту,
-    /// найдя пустоту сканирует снова, на нличие камешка сверху. При наличии - 
-    /// "роняет" его на пустое место. Упавшие амешки заносятся в колонки,
+    /// найдя пустоту сканирует снова, на наличие камешка сверху. При наличии - 
+    /// "роняет" его на пустое место. Упавшие камешки заносятся в колонки,
     /// Колонки заносятся в список на обновление спрайтов
     /// </summary>
     /// <returns>Список колонок камешков, которые переместились, 
@@ -622,8 +619,10 @@ public class Level
                         {
                             GemArray[row, column] = GemArray[aboveRow, column];
                             // ячейку из которой спустили камешек зануляем
+#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
                             GemArray[aboveRow, column] = null;
-                            // Обновляем координату ряда у камешка
+#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
+                              // Обновляем координату ряда у камешка
                             GemArray[row, column].Row = row;
 
                             //запоминаем камешек для анимации спрайтов

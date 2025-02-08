@@ -1,26 +1,18 @@
-﻿using System;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 /// <summary>
-/// Вспомгательный объект, для обработки обмена местами камешков
+/// Вспомогательный объект, для обработки обмена местами камешков
 /// </summary>
-public class Swap : IEquatable<Swap>
+public class Swap(Gem gemA, Gem gemB) : IEquatable<Swap>
 {
     public Gem GemA
     {
         get;
-    }
+    } = gemA;
     public Gem GemB
     {
         get;
-    }
-
-    public Swap(Gem gemA, Gem gemB)
-    {
-        GemA = gemA;
-        GemB = gemB;
-    }
+    } = gemB;
 
     public bool Equals(Swap other)
     {

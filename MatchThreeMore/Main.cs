@@ -1,6 +1,4 @@
-﻿using UIKit;
-
-namespace MatchThreeMore;
+﻿namespace MatchThreeMore;
 
 public class Application
 {

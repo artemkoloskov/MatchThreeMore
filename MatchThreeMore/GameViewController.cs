@@ -1,11 +1,5 @@
-﻿using System;
-using System.Threading.Tasks;
-using System.Text;
-
-using Foundation;
+﻿using System.Text;
 using SpriteKit;
-using UIKit;
-using System.IO;
 
 using static MatchThreeMore.Properties;
 
@@ -68,7 +62,7 @@ public partial class GameViewController : UIViewController
 
         scene.Level = level;
 
-        // инциализируем делегат обработки обмена местами камешков
+        // инициализируем делегат обработки обмена местами камешков
         scene.SwipeHandler = HandleSwipeAsync;
 
         // Кнопка "В меню"
@@ -100,7 +94,7 @@ public partial class GameViewController : UIViewController
         {
             pauseLabel.Hidden = scene.GameIsPaused;
             scene.GameIsPaused = !scene.GameIsPaused;
-            scene.SwitchBacgroundZPosition();
+            scene.SwitchBackgroundZPosition();
         };
 
         // получаем лучший счет
@@ -225,7 +219,7 @@ public partial class GameViewController : UIViewController
             Console.Write("File " + highScoresFileName + " not found. \n" + e);
         }
 
-        // парсим счет из строки загруженрной из файла
+        // парсим счет из строки загруженной из файла
         string[] line = highScoreText.Split(',');
 
         if (line.GetLength(0) != 1)
@@ -402,7 +396,7 @@ public partial class GameViewController : UIViewController
     {
         // Сканирование массива до тех пор, пока в модели остаются цепочки, после уничтожения
         // и спуска камешков
-        while (level.RetriveChain() != null)
+        while (level.RetrieveChain() != null)
         {
             // уничтожаем цепочки
             level.DestroyChains();
@@ -440,7 +434,7 @@ public partial class GameViewController : UIViewController
                     }
                 }
 
-                // очищаем список бнусами на анимацию
+                // очищаем список бонусами на анимацию
                 level.BonusesToAnimate.Clear();
             }
             else
@@ -459,7 +453,7 @@ public partial class GameViewController : UIViewController
 
         }
 
-        // обновлем лэйблы с счетом
+        // обновляем лэйблы с счетом
         scoreLabel.Text = level.Score.ToString();
         highScoreLabel.Text = "Лучший счет: " + Math.Max(level.Score, highScore) + "";
 

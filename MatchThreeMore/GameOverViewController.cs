@@ -1,19 +1,12 @@
 using AudioToolbox;
-using Foundation;
-using System;
-using UIKit;
 
 using static MatchThreeMore.AdditionalMethods;
 using static MatchThreeMore.Properties;
 
 namespace MatchThreeMore;
 
-public partial class GameOverViewController : UIViewController
+public partial class GameOverViewController(IntPtr handle) : UIViewController(handle)
 {
-    public GameOverViewController(IntPtr handle) : base(handle)
-    {
-    }
-
     public UILabel ScoreLabel = [];
 
     public override void ViewDidLoad()
