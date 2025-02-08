@@ -9,13 +9,12 @@ using System;
 using System.CodeDom.Compiler;
 using UIKit;
 
-namespace MatchThreeMore
+namespace MatchThreeMore;
+
+[Register ("GameOverViewController")]
+partial class GameOverViewController
 {
-    [Register ("GameOverViewController")]
-    partial class GameOverViewController
+    void ReleaseDesignerOutlets ()
     {
-        void ReleaseDesignerOutlets ()
-        {
-        }
     }
 }
