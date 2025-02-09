@@ -5,24 +5,31 @@ namespace MatchThreeMore;
 
 public partial class MainMenuViewController(IntPtr handle) : UIViewController(handle)
 {
-    private readonly string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
+    private readonly string _highScoresFileName = Path.Combine(
+        Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
+        "High_scores.txt");
+
     public static bool IsDebugRelease =>
         #if DEBUG
             true;
-
-#else
-#endif
-
-
+        #endif
 
     public override void ViewDidLoad()
     {
+        ArgumentNullException.ThrowIfNull(View);
+        ArgumentNullException.ThrowIfNull(Storyboard);
+        ArgumentNullException.ThrowIfNull(NavigationController);
+
         base.ViewDidLoad();
 
+        UIImage sourceImage = UIImage.FromFile("background.jpg")
+            ?? throw new Exception("Background image not found");
+
         // Устанавливаем бэкграунд из текстуры
-        UIImageView background = new(
-            ResizeUIImage(
-                UIImage.FromFile("background.jpg"), (float)View.Bounds.Size.Width, (float)View.Bounds.Size.Height));
+        UIImageView background = new(ResizeUIImage(
+            sourceImage,
+            (float)View.Bounds.Size.Width,
+            (float)View.Bounds.Size.Height));
 
         View.Add(background);
 
@@ -39,10 +46,10 @@ public partial class MainMenuViewController(IntPtr handle) : UIViewController(ha
         {
             Frame = new CGRect
             (
-                View.Bounds.Size.Width / 2 - HighScoreLabelWidth / 2,
-                HighScoreLabelY + 100,
-                HighScoreLabelWidth,
-                CommonLabelHeight
+                View.Bounds.Size.Width / 2 - HIGH_SCORE_LABEL_WIDTH / 2,
+                HIGH_SCORE_LABEL_Y + 100,
+                HIGH_SCORE_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
             ),
             TextAlignment = UITextAlignment.Center,
             Font = CommonFont,
@@ -54,9 +61,9 @@ public partial class MainMenuViewController(IntPtr handle) : UIViewController(ha
 
         View.Add(highScoreLabel);
 
-
         startButton.TouchUpInside += (sender, e) => {
-            GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
+            GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController
+                ?? throw new Exception("GameView not found");
             NavigationController.PushViewController(gameView, true);
         };
         if (IsDebugRelease)
@@ -64,7 +71,7 @@ public partial class MainMenuViewController(IntPtr handle) : UIViewController(ha
             UIButton startInDevModeButton = new()
             {
                 Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 175, 150, 50),
-                
+
                 BackgroundColor = ButtonColor
             };
 
@@ -74,7 +81,8 @@ public partial class MainMenuViewController(IntPtr handle) : UIViewController(ha
 
             startInDevModeButton.TouchUpInside += (sender, e) =>
             {
-                GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController;
+                GameViewController gameView = Storyboard.InstantiateViewController("GameView") as GameViewController
+                    ?? throw new Exception("GameView not found");
                 gameView.DevModeIsOn = true;
                 NavigationController.PushViewController(gameView, true);
             };
@@ -91,11 +99,11 @@ public partial class MainMenuViewController(IntPtr handle) : UIViewController(ha
         // загрузка из файла
         try
         {
-            highScoreText = File.ReadAllText(highScoresFileName);
+            highScoreText = File.ReadAllText(_highScoresFileName);
         }
         catch (Exception e)
         {
-            Console.Write("File " + highScoresFileName + " not found. \n" + e);
+            Console.Write("File " + _highScoresFileName + " not found. \n" + e);
         }
 
         // парсим счет из строки загруженной из файла

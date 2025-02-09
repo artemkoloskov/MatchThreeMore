@@ -23,7 +23,7 @@ public class Gem : IEquatable<Gem>
     public GemType GemType { get; }
     public int Row { get; set; }
     public int Column { get; set; }
-    public SKSpriteNode Sprite { get; set; }
+    public SKSpriteNode? Sprite { get; set; }
     public bool IsALineDestroyer { get; set; }
     public bool IsHorizontal { get; set; }
     public bool IsABomb { get; set; }
@@ -95,6 +95,7 @@ public class Gem : IEquatable<Gem>
             {
                 return GemType + "_horizontal";
             }
+
             return GemType + "_vertical";
         }
 
@@ -119,6 +120,7 @@ public class Gem : IEquatable<Gem>
             {
                 return GemType + "_horizontal_selected";
             }
+
             return GemType + "_vertical_selected";
         }
 
@@ -133,36 +135,41 @@ public class Gem : IEquatable<Gem>
     public override string ToString()
     {
         StringBuilder str = new();
-        str.Append(GemType + "; (" + Row + ", " + Column + ")");
+        _ = str.Append(GemType + "; (" + Row + ", " + Column + ")");
 
         if (IsALineDestroyer)
+        {
             if (IsHorizontal)
             {
-                str.Append("; гор. разр.");
+                _ = str.Append("; гор. разр.");
             }
             else
             {
-                str.Append("; верт. разр.");
+                _ = str.Append("; верт. разр.");
             }
+        }
 
         if (IsABomb)
         {
-            str.Append("; бомба");
+            _ = str.Append("; бомба");
         }
 
         return str.ToString();
     }
 
-    public bool Equals(Gem other)
+    public bool Equals(Gem? other)
     {
-        return GemType == other.GemType && Row == other.Row &&
-            Column == other.Column && IsALineDestroyer == other.IsALineDestroyer &&
-            IsHorizontal == other.IsHorizontal;
+        return other is not null
+            && GemType == other.GemType
+            && Row == other.Row
+            && Column == other.Column
+            && IsALineDestroyer == other.IsALineDestroyer
+            && IsHorizontal == other.IsHorizontal;
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return obj != null && (obj is Swap objAsSwap) && Equals(objAsSwap);
+        return obj is not null && (obj is Swap objAsSwap) && Equals(objAsSwap);
     }
 
     public override int GetHashCode()

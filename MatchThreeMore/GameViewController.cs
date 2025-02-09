@@ -7,26 +7,26 @@ namespace MatchThreeMore;
 
 public partial class GameViewController : UIViewController
 {
-    public bool DevModeIsOn
-    {
-        get; set;
-    }
+    public bool DevModeIsOn { get; set; }
 
-    private Level level;
-    private GameScene scene;
+    private Level _level = default!;
+    private GameScene _scene = default!;
 
-    private NSTimer gameTimer;
-    private int currentTime = LevelTime;
+    private NSTimer? _gameTimer;
+    private int _currentTime = LEVEL_TIME;
 
-    private int highScore;
-    private readonly string highScoresFileName = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments), "High_scores.txt");
+    private int _highScore;
+    private readonly string _highScoresFileName =
+        Path.Combine(Environment.GetFolderPath(
+            Environment.SpecialFolder.MyDocuments),
+            "High_scores.txt");
 
-    private bool chainsHadBonuses;
+    private bool _chainsHadBonuses;
 
-    private UILabel timerLabel;
-    private UILabel scoreLabel;
-    private UILabel highScoreLabel;
-    private UILabel pauseLabel;
+    private UILabel _timerLabel = default!;
+    private UILabel _scoreLabel = default!;
+    private UILabel _highScoreLabel = default!;
+    private UILabel _pauseLabel = default!;
 
     protected GameViewController(IntPtr handle) : base(handle)
     {
@@ -35,15 +35,20 @@ public partial class GameViewController : UIViewController
 
     public override void ViewDidLoad()
     {
+        ArgumentNullException.ThrowIfNull(View);
+        ArgumentNullException.ThrowIfNull(Storyboard);
+        ArgumentNullException.ThrowIfNull(NavigationController);
+
         base.ViewDidLoad();
 
         if (DevModeIsOn)
         {
-            currentTime = DevLevelTime;
+            _currentTime = DEV_LEVEL_TIME;
         }
 
         // Configure the view.
-        SKView skView = (SKView)View;
+        SKView skView = (SKView)View
+            ?? throw new Exception("View is not SKView");
         skView.ShowsFPS = DevModeIsOn;
         skView.ShowsNodeCount = DevModeIsOn;
 
@@ -51,34 +56,118 @@ public partial class GameViewController : UIViewController
         skView.IgnoresSiblingOrder = true;
 
         // Create and configure the scene.
-        scene = SKNode.FromFile<GameScene>("GameScene");
-        scene.ScaleMode = SKSceneScaleMode.AspectFill;
-
+        _scene = SKNode.FromFile<GameScene>("GameScene")
+            ?? throw new Exception("GameScene not found");
+        _scene.ScaleMode = SKSceneScaleMode.AspectFill;
+sssx
         // Передаем сцене данные о размере вью
-        scene.SetSize(skView.Bounds.Size);
+        _scene.SetSize(skView.Bounds.Size);
 
         // Создаем игровой уровень, передаем его сцене
-        level = new Level(DevModeIsOn);
+        _level = new Level(DevModeIsOn);
 
-        scene.Level = level;
+        _scene.Level = _level;
 
         // инициализируем делегат обработки обмена местами камешков
-        scene.SwipeHandler = HandleSwipeAsync;
+        _scene.SwipeHandler = HandleSwipeAsync;
 
         // Кнопка "В меню"
         UIButton stopButton = new()
         {
             Frame = new CGRect(30, View.Bounds.Size.Height - 100, 120, 45),
             BackgroundColor = ButtonColor
-        };
+        };≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈≈
 
         stopButton.SetTitle("В МЕНЮ", UIControlState.Normal);
 
         stopButton.TouchUpInside += (sender, e) =>
         {
-            gameTimer.Invalidate();
+            _gameTimer?.Invalidate();
             UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
             NavigationController.PushViewController(mainMenu, true);
+        };
+
+        // получаем лучший счет
+        _highScore = GetHighScore();
+
+        // лэйбл с лучшим счетом
+        _highScoreLabel = new UILabel
+        {
+            Frame = new CGRect
+            (
+                skView.Bounds.Size.Width / 2 - HIGH_SCORE_LABEL_WIDTH / 2,
+                HIGH_SCORE_LABEL_Y,
+                HIGH_SCORE_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
+            ),
+            TextAlignment = UITextAlignment.Center,
+            Font = CommonFont,
+            Text = "Лучший счёт: " + _highScore,
+            TextColor = UIColor.White
+        };
+
+        // лэйбл с таймером
+        _timerLabel = new UILabel
+        {
+            Frame = new CGRect
+            (
+                skView.Bounds.Size.Width / 2 - COMMON_LABEL_WIDTH / 2,
+                TIMER_LABEL_Y,
+                COMMON_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
+            ),
+            Font = CommonFont,
+            TextAlignment = UITextAlignment.Center,
+            TextColor = UIColor.White
+        };
+
+        // лэйбл с надписью Счет
+        UILabel scoreTitle = new()
+        {
+            Frame = new CGRect
+            (
+                skView.Bounds.Size.Width / 2 - COMMON_LABEL_WIDTH / 2,
+                SCORE_TITLE_LABEL_Y,
+                COMMON_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
+            ),
+            TextAlignment = UITextAlignment.Center,
+            Font = CommonFont,
+            Text = "Счёт:",
+            TextColor = UIColor.White
+        };
+
+        // лэйбл со счетом
+        _scoreLabel = new UILabel
+        {
+            Frame = new CGRect
+            (
+                skView.Bounds.Size.Width / 2 - COMMON_LABEL_WIDTH / 2,
+                SCORE_LABEL_Y,
+                COMMON_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
+            ),
+            TextAlignment = UITextAlignment.Center,
+            Font = CommonFont,
+            Text = "0",
+            TextColor = UIColor.White
+        };
+
+        // лэйбл с надписью Пауза
+        _pauseLabel = new UILabel
+        {
+            Hidden = true,
+            Frame = new CGRect
+            (
+                skView.Bounds.Size.Width / 2 - COMMON_LABEL_WIDTH / 2,
+                skView.Bounds.Size.Height / 2 - COMMON_LABEL_HEIGHT / 2,
+                COMMON_LABEL_WIDTH,
+                COMMON_LABEL_HEIGHT
+            ),
+            TextAlignment = UITextAlignment.Center,
+            Font = CommonFont,
+            Text = "ПАУЗА",
+            TextColor = UIColor.White
         };
 
         // Кнопка паузы
@@ -92,105 +181,22 @@ public partial class GameViewController : UIViewController
 
         pauseButton.TouchUpInside += (sender, e) =>
         {
-            pauseLabel.Hidden = scene.GameIsPaused;
-            scene.GameIsPaused = !scene.GameIsPaused;
-            scene.SwitchBackgroundZPosition();
-        };
-
-        // получаем лучший счет
-        highScore = GetHighScore();
-
-        // лэйбл с лучшим счетом
-        highScoreLabel = new UILabel
-        {
-            Frame = new CGRect
-            (
-                skView.Bounds.Size.Width / 2 - HighScoreLabelWidth / 2,
-                HighScoreLabelY,
-                HighScoreLabelWidth,
-                CommonLabelHeight
-            ),
-            TextAlignment = UITextAlignment.Center,
-            Font = CommonFont,
-            Text = "Лучший счёт: " + highScore,
-            TextColor = UIColor.White
-        };
-
-        // лэйбл с таймером
-        timerLabel = new UILabel
-        {
-            Frame = new CGRect
-            (
-                skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
-                TimerLabelY,
-                CommonLabelWidth,
-                CommonLabelHeight
-            ),
-            Font = CommonFont,
-            TextAlignment = UITextAlignment.Center,
-            TextColor = UIColor.White
-        };
-
-        // лэйбл с надписью Счет
-        UILabel scoreTitle = new()
-        {
-            Frame = new CGRect
-            (
-                skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
-                ScoreTitleLabelY,
-                CommonLabelWidth,
-                CommonLabelHeight
-            ),
-            TextAlignment = UITextAlignment.Center,
-            Font = CommonFont,
-            Text = "Счёт:",
-            TextColor = UIColor.White
-        };
-
-        // лэйбл со счетом
-        scoreLabel = new UILabel
-        {
-            Frame = new CGRect
-            (
-                skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
-                ScoreLabelY,
-                CommonLabelWidth,
-                CommonLabelHeight
-            ),
-            TextAlignment = UITextAlignment.Center,
-            Font = CommonFont,
-            Text = "0",
-            TextColor = UIColor.White
-        };
-
-        // лэйбл с надписью Пауза
-        pauseLabel = new UILabel
-        {
-            Hidden = true,
-            Frame = new CGRect
-            (
-                skView.Bounds.Size.Width / 2 - CommonLabelWidth / 2,
-                skView.Bounds.Size.Height / 2 - CommonLabelHeight / 2,
-                CommonLabelWidth,
-                CommonLabelHeight
-            ),
-            TextAlignment = UITextAlignment.Center,
-            Font = CommonFont,
-            Text = "ПАУЗА",
-            TextColor = UIColor.White
+            _pauseLabel.Hidden = _scene.GameIsPaused;
+            _scene.GameIsPaused = !_scene.GameIsPaused;
+            _scene.SwitchBackgroundZPosition();
         };
 
         // добавляем элементы интерфейса на вью
         skView.Add(stopButton);
         skView.Add(pauseButton);
-        skView.Add(highScoreLabel);
-        skView.Add(timerLabel);
+        skView.Add(_highScoreLabel);
+        skView.Add(_timerLabel);
         skView.Add(scoreTitle);
-        skView.Add(scoreLabel);
-        skView.Add(pauseLabel);
+        skView.Add(_scoreLabel);
+        skView.Add(_pauseLabel);
 
         // Present the scene.
-        skView.PresentScene(scene);
+        skView.PresentScene(_scene);
 
         // Начало игры
         BeginGame();
@@ -212,11 +218,11 @@ public partial class GameViewController : UIViewController
         // загрузка из файла
         try
         {
-            highScoreText = File.ReadAllText(highScoresFileName);
+            highScoreText = File.ReadAllText(_highScoresFileName);
         }
         catch (Exception e)
         {
-            Console.Write("File " + highScoresFileName + " not found. \n" + e);
+            Console.Write("File " + _highScoresFileName + " not found. \n" + e);
         }
 
         // парсим счет из строки загруженной из файла
@@ -238,7 +244,9 @@ public partial class GameViewController : UIViewController
 
     public override UIInterfaceOrientationMask GetSupportedInterfaceOrientations()
     {
-        return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone ? UIInterfaceOrientationMask.AllButUpsideDown : UIInterfaceOrientationMask.All;
+        return UIDevice.CurrentDevice.UserInterfaceIdiom == UIUserInterfaceIdiom.Phone
+            ? UIInterfaceOrientationMask.AllButUpsideDown
+            : UIInterfaceOrientationMask.All;
     }
 
     public override void DidReceiveMemoryWarning()
@@ -252,37 +260,40 @@ public partial class GameViewController : UIViewController
         return false;
     }
 
-    //++++++++++++ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ+++++++++++++
-
     /// <summary>
     /// Начать игру, перемешав камешки на уровне и запустив таймер обратного
     /// отсчета
     /// </summary>
     private void BeginGame()
     {
+        ArgumentNullException.ThrowIfNull(Storyboard);
+        ArgumentNullException.ThrowIfNull(NavigationController);
+
         // перемешиваем камешки в модели и заполняем спрайтами сцену
         ShuffleGems();
 
         // запуск таймера
-        gameTimer = NSTimer.CreateRepeatingScheduledTimer(TimeSpan.FromSeconds(1.0), delegate
+        _gameTimer = NSTimer.CreateRepeatingScheduledTimer(TimeSpan.FromSeconds(1.0), delegate
         {
-            // когда таймер дойдет до 0
-            if (TimerAction() == 0)
+            if (TimerAction() != 0)
             {
-                // деактивировать таймер
-                gameTimer.Invalidate();
-
-                // Записать в файл новый лучший счет
-                int newHighScore = Math.Max(highScore, Convert.ToInt32(scoreLabel.Text));
-                File.WriteAllText(highScoresFileName, "score, " + newHighScore);
-
-                // перейти к экрану конца игры
-                GameOverViewController gameOver = Storyboard.InstantiateViewController("GameOver") as GameOverViewController;
-
-                // Передаем счет игры экрану конца игры
-                gameOver.ScoreLabel.Text = scoreLabel.Text;
-                NavigationController.PushViewController(gameOver, true);
+                return;
             }
+
+            // деактивировать таймер
+            _gameTimer?.Invalidate();
+
+            // Записать в файл новый лучший счет
+            int newHighScore = Math.Max(_highScore, Convert.ToInt32(_scoreLabel.Text));
+            File.WriteAllText(_highScoresFileName, "score, " + newHighScore);
+
+            // перейти к экрану конца игры
+            GameOverViewController gameOver = Storyboard.InstantiateViewController("GameOver") as GameOverViewController
+                ?? throw new Exception("GameOverViewController not found");
+
+            // Передаем счет игры экрану конца игры
+            gameOver.ScoreLabel.Text = _scoreLabel.Text;
+            NavigationController.PushViewController(gameOver, true);
         });
     }
 
@@ -292,39 +303,39 @@ public partial class GameViewController : UIViewController
     /// <returns>Текущее время таймера.</returns>
     private int TimerAction()
     {
-        if (!scene.GameIsPaused)
+        if (!_scene.GameIsPaused)
         {
-            currentTime--;
+            _currentTime--;
         }
 
-        int minutes = Math.Abs(currentTime / 60);
-        int seconds = currentTime % 60;
+        int minutes = Math.Abs(_currentTime / 60);
+        int seconds = _currentTime % 60;
 
         StringBuilder timerText = new();
 
         if (minutes < 10)
         {
-            timerText.Append("0" + minutes);
+            _ = timerText.Append("0" + minutes);
         }
         else
         {
-            timerText.Append(minutes);
+            _ = timerText.Append(minutes);
         }
 
-        timerText.Append(":");
+        _ = timerText.Append(':');
 
         if (seconds < 10)
         {
-            timerText.Append("0" + seconds);
+            _ = timerText.Append("0" + seconds);
         }
         else
         {
-            timerText.Append(seconds);
+            _ = timerText.Append(seconds);
         }
 
-        timerLabel.Text = timerText.ToString();
+        _timerLabel.Text = timerText.ToString();
 
-        return currentTime;
+        return _currentTime;
     }
 
     /// <summary>
@@ -332,8 +343,8 @@ public partial class GameViewController : UIViewController
     /// </summary>
     private void ShuffleGems()
     {
-        level.Shuffle();
-        scene.AttachSpritesToGems(level.GemList);
+        _level.Shuffle();
+        _scene.AttachSpritesToGems(_level.GemList);
     }
 
     /// <summary>
@@ -346,31 +357,33 @@ public partial class GameViewController : UIViewController
     /// <param name="swap">Объект с камешками для обмена.</param>
     public async void HandleSwipeAsync(Swap swap)
     {
+        ArgumentNullException.ThrowIfNull(View);
+
         // отключаем интерактивность
         View.UserInteractionEnabled = false;
 
-        bool swapIsValid = level.Swaps.Contains(swap);
+        bool swapIsValid = _level.Swaps.Contains(swap);
 
         if (swapIsValid)
         {
             // проводим обмен в модели
-            level.Perform(swap);
+            _level.Perform(swap);
 
             // анимируем обмен на сцене
-            scene.AnimateSwap(swap, swapIsValid);
-            await Task.Delay(SwapAnimationDuration);
+            _scene.AnimateSwap(swap, swapIsValid);
+            await Task.Delay(SWAP_ANIMATION_DURATION);
 
             // обрабатываем полученные цепочки
-            await HandleChains();
+            await HandleChainsAsync();
 
             // задержка, нужная для всех анимаций перед тем,как включать интерактивность
-            int delay = DestructionAnimationDuration + FallAnimationDuration;
+            int delay = DESTRUCTION_ANIMATION_DURATION + FALL_ANIMATION_DURATION;
 
             // если был разрушитель - увеличиваем время задержки
-            if (chainsHadBonuses)
+            if (_chainsHadBonuses)
             {
-                delay += LineDestructionDuration;
-                chainsHadBonuses = false;
+                delay += LINE_DESTRUCTION_DURATION;
+                _chainsHadBonuses = false;
             }
 
             await Task.Delay(delay);
@@ -379,9 +392,9 @@ public partial class GameViewController : UIViewController
         }
         else
         {
-            scene.AnimateSwap(swap, swapIsValid);
+            _scene.AnimateSwap(swap, swapIsValid);
 
-            await Task.Delay(SwapAnimationDuration * 2);
+            await Task.Delay(SWAP_ANIMATION_DURATION * 2);
 
             View.UserInteractionEnabled = true;
         }
@@ -389,84 +402,84 @@ public partial class GameViewController : UIViewController
 
     /// <summary>
     /// Поиск и уничтожение цепей, проигрывание анимации уничтожения,
-    /// обработка падения камешков на уровне модели, проигрывание анимации 
+    /// обработка падения камешков на уровне модели, проигрывание анимации
     /// падения, заполнение модели и сцены новыми камешками
     /// </summary>
-    public async Task HandleChains()
+    public async Task HandleChainsAsync()
     {
         // Сканирование массива до тех пор, пока в модели остаются цепочки, после уничтожения
         // и спуска камешков
-        while (level.RetrieveChain() != null)
+        while (_level.RetrieveChain() is not null)
         {
             // уничтожаем цепочки
-            level.DestroyChains();
+            _level.DestroyChains();
 
             // если при уничтожении были найдены бонусы - анимируем сцену особым образом
-            if (level.BonusesToAnimate.Count > 0)
+            if (_level.BonusesToAnimate.Count <= 0)
+            {
+                // бонусов нет, обычное удаление цепочек
+                _scene.AnimateDestructionOfChains(_level.DestroyedChains);
+
+                _level.DestroyedChains.Clear();
+
+                await Task.Delay(DESTRUCTION_ANIMATION_DURATION);
+            }
+            else
             {
                 // Цикл проходит по всем бонусам, анимирует их и анимирует удаление найденных цепочек
-                foreach (Gem gem in level.BonusesToAnimate)
+                foreach (Gem gem in _level.BonusesToAnimate)
                 {
                     if (gem.IsALineDestroyer)
                     {
-                        chainsHadBonuses = true;
+                        _chainsHadBonuses = true;
 
-                        scene.AnimateLineDestroyer(gem);
+                        _scene.AnimateLineDestroyer(gem);
 
-                        scene.AnimateDestructionOfChains(level.DestroyedChains);
+                        _scene.AnimateDestructionOfChains(_level.DestroyedChains);
 
-                        level.DestroyedChains.Clear();
+                        _level.DestroyedChains.Clear();
 
-                        await Task.Delay(LineDestructionDuration);
+                        await Task.Delay(LINE_DESTRUCTION_DURATION);
                     }
 
                     if (gem.IsABomb)
                     {
-                        chainsHadBonuses = true;
+                        _chainsHadBonuses = true;
 
-                        scene.AnimateBomb(gem);
+                        _scene.AnimateBomb(gem);
 
-                        scene.AnimateDestructionOfChains(level.DestroyedChains);
+                        _scene.AnimateDestructionOfChains(_level.DestroyedChains);
 
-                        level.DestroyedChains.Clear();
+                        _level.DestroyedChains.Clear();
 
-                        await Task.Delay(LineDestructionDuration);
+                        await Task.Delay(LINE_DESTRUCTION_DURATION);
                     }
                 }
 
                 // очищаем список бонусами на анимацию
-                level.BonusesToAnimate.Clear();
-            }
-            else
-            {
-                // бонусов нет, обычное удаление цепочек
-                scene.AnimateDestructionOfChains(level.DestroyedChains);
-
-                level.DestroyedChains.Clear();
-
-                await Task.Delay(DestructionAnimationDuration);
+                _level.BonusesToAnimate.Clear();
             }
 
             // анимируем падение камешков
-            scene.AnimateFallingGems(level.DropGems());
-            await Task.Delay(FallAnimationDuration);
+            _scene.AnimateFallingGems(_level.DropGems());
+            await Task.Delay(FALL_ANIMATION_DURATION);
 
         }
 
         // обновляем лэйблы с счетом
-        scoreLabel.Text = level.Score.ToString();
-        highScoreLabel.Text = "Лучший счет: " + Math.Max(level.Score, highScore) + "";
+        _scoreLabel.Text = _level.Score.ToString();
+        _highScoreLabel.Text = "Лучший счет: " + Math.Max(_level.Score, _highScore) + "";
 
         // вызываем метод заполнения пустот в модели, создаем для них спрайты
-        scene.AttachSpritesToGems(level.FillBlanks());
+        _scene.AttachSpritesToGems(_level.FillBlanks());
 
         // создаем спрайты для новых бонусов
-        scene.AttachSpritesToGems(level.BonusesToAddSpritesTo);
+        _scene.AttachSpritesToGems(_level.BonusesToAddSpritesTo);
 
         // очищаем списки обработанных бонусов
-        level.BonusesToAddSpritesTo.Clear();
+        _level.BonusesToAddSpritesTo.Clear();
 
         // загружаем список доступных обменов
-        level.DetectPossibleSwaps();
+        _level.DetectPossibleSwaps();
     }
 }

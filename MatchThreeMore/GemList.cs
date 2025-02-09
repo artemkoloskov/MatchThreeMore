@@ -10,11 +10,16 @@ public class GemList : List<Gem>
 
     }
 
-    public GemList(Gem[,] gems)
+    public GemList(Gem?[,] gems)
     {
-        foreach (var gem in gems)
+        foreach (Gem? gem in gems)
         {
-            this.Add(gem);
+            if (gem is null)
+            {
+                continue;
+            }
+
+            Add(gem);
         }
     }
 
@@ -22,7 +27,7 @@ public class GemList : List<Gem>
     /// Проверяет цепочку на наличие в ней бонуса, возвращает бонус.
     /// </summary>
     /// <returns>The for destroyers in list.</returns>
-    public Gem GetBonus()
+    public Gem? GetBonus()
     {
         foreach (Gem gem in this)
         {
@@ -57,11 +62,11 @@ public class GemList : List<Gem>
     /// <summary>
     /// Проверка на наличе бонуса в списке
     /// </summary>
-    /// <returns><c>true</c>, если бонус есть, <c>false</c> если 
+    /// <returns><c>true</c>, если бонус есть, <c>false</c> если
     /// бонуса нет.</returns>
     public bool HasBonus()
     {
-        return GetBonus() != null;
+        return GetBonus() is not null;
     }
 
     /// <summary>

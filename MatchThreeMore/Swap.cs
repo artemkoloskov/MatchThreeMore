@@ -14,14 +14,19 @@ public class Swap(Gem gemA, Gem gemB) : IEquatable<Swap>
         get;
     } = gemB;
 
-    public bool Equals(Swap other)
+    public bool Equals(Swap? other)
     {
+        if (other is null)
+        {
+            return false;
+        }
+
         return GemA.Equals(other.GemA) && GemB.Equals(other.GemB);
     }
 
-    public override bool Equals(object obj)
+    public override bool Equals(object? obj)
     {
-        return obj != null && (obj is Swap objAsSwap) && Equals(objAsSwap);
+        return obj is not null && (obj is Swap objAsSwap) && Equals(objAsSwap);
     }
 
     public override string ToString()

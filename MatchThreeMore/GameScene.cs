@@ -6,12 +6,9 @@ public delegate void Del(Swap swap);
 
 public class GameScene : SKScene
 {
-    public Level Level
-    {
-        get; set;
-    }
-    public Del SwipeHandler;
-    public bool GameIsPaused;
+    public Level? Level { get; set; }
+    public Del? SwipeHandler { get; set; }
+    public bool GameIsPaused { get; set; }
 
     private readonly SKNode _gameLayer = [];
     private readonly SKNode _gemLayer = [];
@@ -39,11 +36,13 @@ public class GameScene : SKScene
 
     public override void DidMoveToView(SKView view)
     {
+        ArgumentNullException.ThrowIfNull(Level);
+
         // Якорь на середину сцены
         AnchorPoint = new CGPoint(0.5f, 0.5f);
 
         // Подсчитываем размеры клетки с камешком. Клетки квадратные
-        _gemCellWidth = ((float)Size.Width - (Properties.GameFieldPadding * 2)) / Level.ColumnsNumber;
+        _gemCellWidth = ((float)Size.Width - (Properties.GAME_FIELD_PADDING * 2)) / Level.ColumnsNumber;
         _gemCellHeight = _gemCellWidth;
 
         AddBackground();
@@ -51,8 +50,10 @@ public class GameScene : SKScene
         AddGemLayer();
     }
 
-    public override void TouchesBegan(NSSet touches, UIEvent evt)
+    public override void TouchesBegan(NSSet touches, UIEvent? evt)
     {
+        ArgumentNullException.ThrowIfNull(Level);
+
         if (GameIsPaused)
         {
             return;
@@ -73,51 +74,62 @@ public class GameScene : SKScene
                 _swipeIsValid = true;
 
                 // Подсвечиваем выбранный камешек
-                ShowSelectionIndicator(Level.GemArray[touchedRow, touchedColumn]);
+                Gem touchedGem = Level.GemArray[touchedRow, touchedColumn]
+                    ?? throw new Exception("Touched gem is null");
+                ShowSelectionIndicator(touchedGem);
             }
         }
     }
 
-    public override void TouchesMoved(NSSet touches, UIEvent evt)
+    public override void TouchesMoved(NSSet touches, UIEvent? evt)
     {
         // определение направления свайпа
-        if (_swipeIsValid && !GameIsPaused)
+        if (!_swipeIsValid || GameIsPaused)
         {
-            foreach (NSObject touch in touches)
+            return;
+        }
+
+        foreach (NSObject touch in touches)
+        {
+            CGPoint touchLocation = ((UITouch)touch).LocationInNode(_gemLayer);
+
+            (bool gotRowAndColumn, int swipeEndColumn, int swipeEndRow) =
+                GetRowAndColumnFromLocation(touchLocation);
+
+            if (!gotRowAndColumn)
             {
-                CGPoint touchLocation = ((UITouch)touch).LocationInNode(_gemLayer);
-
-                (bool gotRowAndColumn, int swipeEndColumn, int swipeEndRow) =
-                    GetRowAndColumnFromLocation(touchLocation);
-
-                if (gotRowAndColumn)
-                {
-                    int horizontalDelta =
-                        GetDeltaDirection(_swipeStartColumn, swipeEndColumn);
-                    int verticalDelta =
-                        GetDeltaDirection(_swipeStartRow, swipeEndRow);
-
-                    if (horizontalDelta != 0 || verticalDelta != 0)
-                    {
-                        TrySwap(horizontalDelta, verticalDelta);
-
-                        _swipeIsValid = false;
-
-                        HideSelectionIndicator();
-                    }
-                }
-
+                continue;
             }
+
+            int horizontalDelta = GetDeltaDirection(
+                _swipeStartColumn,
+                swipeEndColumn);
+            int verticalDelta = GetDeltaDirection(
+                _swipeStartRow,
+                swipeEndRow);
+
+            if (horizontalDelta == 0 && verticalDelta == 0)
+            {
+                continue;
+            }
+
+            TrySwap(horizontalDelta, verticalDelta);
+
+            _swipeIsValid = false;
+
+            HideSelectionIndicator();
         }
     }
 
-    public override void TouchesEnded(NSSet touches, UIEvent evt)
+    public override void TouchesEnded(NSSet touches, UIEvent? evt)
     {
         // когда прикосновение кончается снимаем подсветку камешка
-        if (_selectedSprite.Parent != null && _swipeIsValid && !GameIsPaused)
+        if (_selectedSprite.Parent is null || !_swipeIsValid || GameIsPaused)
         {
-            HideSelectionIndicator();
+            return;
         }
+
+        HideSelectionIndicator();
     }
 
     public override void Update(double currentTime)
@@ -155,7 +167,7 @@ public class GameScene : SKScene
     /// <param name="gems">List of gems to scan</param>
     public void AnnounceBonusGems(GemList gems)
     {
-        // маркер появления на игровом поле разрушителя, для проигрывания 
+        // маркер появления на игровом поле разрушителя, для проигрывания
         // звука появления разрушителя
         bool hasDestroyers = gems.Any(g => g.IsALineDestroyer);
         bool hasBomb = gems.Any(g => g.IsABomb);
@@ -178,19 +190,25 @@ public class GameScene : SKScene
     /// <param name="swapIsValid">Индикатор того, что своп возможен</param>
     public void AnimateSwap(Swap swap, bool swapIsValid)
     {
-        SKSpriteNode spriteA = swap.GemA.Sprite;
-        SKSpriteNode spriteB = swap.GemB.Sprite;
+        SKSpriteNode spriteA = swap.GemA.Sprite
+            ?? throw new Exception("Sprite A is null");
+        SKSpriteNode spriteB = swap.GemB.Sprite
+            ?? throw new Exception("Sprite B is null");
 
         // Спрайт А "приподнимаем", чтобы создать впечатление, что он пролетает над камешком В
         spriteA.ZPosition = 100;
         spriteB.ZPosition = 90;
 
         // Анимация камешка А
-        SKAction moveA = SKAction.MoveTo(spriteB.Position, Properties.SwapAnimationDuration / 1000f);
+        var moveA = SKAction.MoveTo(
+            spriteB.Position,
+            Properties.SWAP_ANIMATION_DURATION / 1000f);
         moveA.TimingMode = SKActionTimingMode.EaseOut;
 
         //Анимация камешка B
-        SKAction moveB = SKAction.MoveTo(spriteA.Position, Properties.SwapAnimationDuration / 1000f);
+        var moveB = SKAction.MoveTo(
+            spriteA.Position,
+            Properties.SWAP_ANIMATION_DURATION / 1000f);
         moveB.TimingMode = SKActionTimingMode.EaseOut;
 
         if (swapIsValid)
@@ -212,7 +230,7 @@ public class GameScene : SKScene
     }
 
     /// <summary>
-    /// Анимация разрушения цепочек 
+    /// Анимация разрушения цепочек
     /// </summary>
     /// <param name="chains">Список цепочек на разрушение.</param>
     public void AnimateDestructionOfChains(List<GemList> chains)
@@ -222,7 +240,7 @@ public class GameScene : SKScene
         bool hadDestroyers = false;
         bool hadBombs = false;
 
-        if (chains == null)
+        if (chains is null)
         {
             return;
         }
@@ -231,8 +249,9 @@ public class GameScene : SKScene
         {
             foreach (Gem gem in chain)
             {
-                SKSpriteNode sprite = gem.Sprite;
-                SKAction spriteAction = SKAction.FadeAlphaTo(0.0f, Properties.DestructionAnimationDuration / 1000f);
+                SKSpriteNode sprite = gem.Sprite
+                    ?? throw new Exception("Sprite is null");
+                var spriteAction = SKAction.FadeAlphaTo(0.0f, Properties.DESTRUCTION_ANIMATION_DURATION / 1000f);
                 sprite.RunAction(SKAction.Sequence(spriteAction, SKAction.RemoveFromParent()));
 
                 AnimateScore(chain);
@@ -265,6 +284,9 @@ public class GameScene : SKScene
     /// <param name="destroyer">Активированный бонус.</param>
     public void AnimateLineDestroyer(Gem destroyer)
     {
+        ArgumentNullException.ThrowIfNull(Level);
+        ArgumentNullException.ThrowIfNull(destroyer.Sprite);
+
         SKSpriteNode sprite;
         CGPoint centerPoint;
         SKAction resizeSprite;
@@ -276,9 +298,13 @@ public class GameScene : SKScene
 
             sprite = SKSpriteNode.FromImageNamed("destroyer_ray_horisontal");
 
-            centerPoint = new CGPoint(_gemCellWidth * Level.ColumnsNumber / 2, destroyer.Sprite.Position.Y);
+            centerPoint = new CGPoint(
+                _gemCellWidth * Level.ColumnsNumber / 2,
+                destroyer.Sprite.Position.Y);
 
-            resizeSprite = SKAction.ResizeToWidth(newWidth, Properties.LineDestructionDuration / 1000f);
+            resizeSprite = SKAction.ResizeToWidth(
+                newWidth,
+                Properties.LINE_DESTRUCTION_DURATION / 1000f);
         }
         else
         {
@@ -286,12 +312,18 @@ public class GameScene : SKScene
 
             sprite = SKSpriteNode.FromImageNamed("destroyer_ray_vertical");
 
-            centerPoint = new CGPoint(destroyer.Sprite.Position.X, _gemCellHeight * Level.RowsNumber / 2);
+            centerPoint = new CGPoint(
+                destroyer.Sprite.Position.X,
+                _gemCellHeight * Level.RowsNumber / 2);
 
-            resizeSprite = SKAction.ResizeToHeight(newHeight, Properties.LineDestructionDuration / 1000f);
+            resizeSprite = SKAction.ResizeToHeight(
+                newHeight,
+                Properties.LINE_DESTRUCTION_DURATION / 1000f);
         }
 
-        SKAction moveToCenter = SKAction.MoveTo(centerPoint, Properties.LineDestructionDuration / 1000f);
+        var moveToCenter = SKAction.MoveTo(
+            centerPoint,
+            Properties.LINE_DESTRUCTION_DURATION / 1000f);
 
         CGPoint initialPosition = GetPositionFromRowAndColumn(destroyer.Row, destroyer.Column);
         CGSize initialSize = new(_gemCellWidth, _gemCellHeight);
@@ -303,7 +335,9 @@ public class GameScene : SKScene
         _gemLayer.AddChild(sprite);
 
         sprite.RunAction(moveToCenter);
-        sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
+        sprite.RunAction(SKAction.Sequence(
+            resizeSprite,
+            SKAction.RemoveFromParent()));
     }
 
     /// <summary>
@@ -313,19 +347,27 @@ public class GameScene : SKScene
     public void AnimateBomb(Gem bomb)
     {
         CGSize initialSize = new(_gemCellWidth, _gemCellHeight);
-        CGSize newSize = new(_gemCellWidth * (Properties.BombBlastRadius * 2 + 1), _gemCellHeight * (Properties.BombBlastRadius * 2 + 1));
-        CGPoint initialPosition = GetPositionFromRowAndColumn(bomb.Row, bomb.Column);
+        CGSize newSize = new(
+            _gemCellWidth * (Properties.BOMB_BLAST_RADIUS * 2 + 1),
+            _gemCellHeight * (Properties.BOMB_BLAST_RADIUS * 2 + 1));
+        CGPoint initialPosition = GetPositionFromRowAndColumn(
+            bomb.Row,
+            bomb.Column);
 
-        SKSpriteNode sprite = SKSpriteNode.FromImageNamed("bomb_blast");
+        var sprite = SKSpriteNode.FromImageNamed("bomb_blast");
         sprite.Size = initialSize;
         sprite.Position = initialPosition;
         sprite.ZPosition = 110;
 
-        SKAction resizeSprite = SKAction.ResizeTo(newSize, Properties.LineDestructionDuration / 1000f);
+        var resizeSprite = SKAction.ResizeTo(
+            newSize,
+            Properties.LINE_DESTRUCTION_DURATION / 1000f);
 
         _gemLayer.AddChild(sprite);
 
-        sprite.RunAction(SKAction.Sequence(resizeSprite, SKAction.RemoveFromParent()));
+        sprite.RunAction(SKAction.Sequence(
+            resizeSprite,
+            SKAction.RemoveFromParent()));
     }
 
     /// <summary>
@@ -337,12 +379,14 @@ public class GameScene : SKScene
         Size = size;
     }
 
-    //++++++++++ДОПОЛНИТЕЛЬНЫЕ МЕТОДЫ+++++++++++++
-
     private void AddGemLayer()
     {
+        ArgumentNullException.ThrowIfNull(Level);
+
         // Расчет позиции нода с камешками в зависимости от высоты и ширины клетки и количества клеток
-        CGPoint layerPosition = new(-_gemCellWidth * Level.ColumnsNumber / 2.0f, -_gemCellHeight * Level.RowsNumber / 2.0f);
+        CGPoint layerPosition = new(
+            -_gemCellWidth * Level.ColumnsNumber / 2.0f,
+            -_gemCellHeight * Level.RowsNumber / 2.0f);
 
         // добавляем в основной нод нод для камешков
         _gemLayer.Position = layerPosition;
@@ -367,11 +411,15 @@ public class GameScene : SKScene
         AddChild(_background);
     }
 
-    private int GetDeltaDirection(int start, int end)
+    private static int GetDeltaDirection(int start, int end)
     {
         int delta = end - start;
 
-        return delta == 0 ? 0 : delta < 0 ? -1 : 1;
+        return delta == 0
+            ? 0
+            : delta < 0
+                ? -1
+                : 1;
     }
 
     /// <summary>
@@ -380,14 +428,17 @@ public class GameScene : SKScene
     /// <param name="gem">Камешек которому добавляется спрайт.</param>
     private void AttachSpriteToGem(Gem gem)
     {
-        SKSpriteNode sprite;
+        ArgumentNullException.ThrowIfNull(Level);
+
+        SKSpriteNode? sprite;
 
         // Если разрушитель - открепляем старый спрайт на этом месте от слоя камешков
-        if ((gem.IsALineDestroyer || gem.IsABomb) && Level.GemArray[gem.Row, gem.Column] != null)
+        if ((gem.IsALineDestroyer || gem.IsABomb)
+            && Level.GemArray[gem.Row, gem.Column] is not null)
         {
-            sprite = Level.GemArray[gem.Row, gem.Column].Sprite;
+            sprite = Level.GemArray[gem.Row, gem.Column]?.Sprite;
 
-            if (sprite != null && sprite.Parent != null)
+            if (sprite is not null && sprite.Parent is not null)
             {
                 sprite.RemoveFromParent();
             }
@@ -407,20 +458,21 @@ public class GameScene : SKScene
         sprite.YScale = 0.5f;
 
         // Анимация появления камешка
-        sprite.RunAction(
-          SKAction.Sequence(
+        sprite.RunAction(SKAction.Sequence(
             SKAction.WaitForDuration(0.25, 0.5),
             SKAction.Group(
-              SKAction.FadeInWithDuration(0.25),
-              SKAction.ScaleTo(1.0f, 0.25)
+                SKAction.FadeInWithDuration(0.25),
+                SKAction.ScaleTo(1.0f, 0.25)
             )
         ));
 
         // если разрушитель - заменяем в массиве камешек
-        if (gem.IsALineDestroyer || gem.IsABomb)
+        if (!gem.IsALineDestroyer && !gem.IsABomb)
         {
-            Level.GemArray[gem.Row, gem.Column] = gem;
+            return;
         }
+
+        Level.GemArray[gem.Row, gem.Column] = gem;
     }
 
     /// <summary>
@@ -431,7 +483,9 @@ public class GameScene : SKScene
     /// <param name="column">Колонка.</param>
     private CGPoint GetPositionFromRowAndColumn(int row, int column)
     {
-        return new CGPoint(column * _gemCellWidth + _gemCellWidth / 2.0f, row * _gemCellHeight + _gemCellHeight / 2.0f);
+        return new CGPoint(
+            column * _gemCellWidth + _gemCellWidth / 2.0f,
+            row * _gemCellHeight + _gemCellHeight / 2.0f);
     }
 
     /// <summary>
@@ -442,6 +496,8 @@ public class GameScene : SKScene
     /// <param name="point">Точка на игровом поле</param>
     private (bool, int, int) GetRowAndColumnFromLocation(CGPoint point)
     {
+        ArgumentNullException.ThrowIfNull(Level);
+
         // Проверяем находится ли точка в рамках нода с камешками
         if (point.X >= 0 && point.X < Level.ColumnsNumber * _gemCellWidth * 1.0f &&
             point.Y >= 0 && point.Y < Level.RowsNumber * _gemCellHeight * 1.0f)
@@ -453,26 +509,33 @@ public class GameScene : SKScene
     }
 
     /// <summary>
-    /// Попытка обмена местами камешков. Сначала подготавливает камешки для смены в класс Swap, 
+    /// Попытка обмена местами камешков. Сначала подготавливает камешки для смены в класс Swap,
     /// затем передаем их делегату SwipeHandler, который обрабатывает смену на уровне модели и представления
     /// </summary>
     /// <param name="horizontalDelta">Смещение по горизонтали</param>
     /// <param name="verticalDelta">Смещение по вертикали</param>
     private void TrySwap(int horizontalDelta, int verticalDelta)
     {
+        ArgumentNullException.ThrowIfNull(Level);
+        ArgumentNullException.ThrowIfNull(SwipeHandler);
+
         int toColumn = _swipeStartColumn + horizontalDelta;
         int toRow = _swipeStartRow + verticalDelta;
 
-        if (toColumn >= 0 && toColumn < Level.ColumnsNumber ||
-            toRow >= 0 && toRow < Level.RowsNumber)
+        if ((toColumn < 0 || toColumn >= Level.ColumnsNumber)
+            && (toRow < 0 || toRow >= Level.RowsNumber))
         {
-            Gem fromGem = Level.GemArray[_swipeStartRow, _swipeStartColumn];
-            Gem toGem = Level.GemArray[toRow, toColumn];
-
-            Swap swap = new(fromGem, toGem);
-
-            SwipeHandler(swap);
+            return;
         }
+
+        Gem fromGem = Level.GemArray[_swipeStartRow, _swipeStartColumn]
+            ?? throw new Exception("From gem is null");
+        Gem toGem = Level.GemArray[toRow, toColumn]
+            ?? throw new Exception("To gem is null");
+
+        Swap swap = new(fromGem, toGem);
+
+        SwipeHandler(swap);
     }
 
     /// <summary>
@@ -481,8 +544,10 @@ public class GameScene : SKScene
     /// <param name="chain">Уничтожаемая цепочка.</param>
     private void AnimateScore(GemList chain)
     {
-        SKSpriteNode firstGem = chain.GetFirstGem().Sprite;
-        SKSpriteNode lastGem = chain.GetLastGem().Sprite;
+        SKSpriteNode firstGem = chain.GetFirstGem().Sprite
+            ?? throw new Exception("First gem is null");
+        SKSpriteNode lastGem = chain.GetLastGem().Sprite
+            ?? throw new Exception("Last gem is null");
 
         CGPoint centerPoint = new(
             (firstGem.Position.X + lastGem.Position.X) / 2,
@@ -498,9 +563,11 @@ public class GameScene : SKScene
 
         _gemLayer.AddChild(scoreLabel);
 
-        SKAction moveAction = SKAction.MoveBy(0, 3, 0.7);
+        var moveAction = SKAction.MoveBy(0, 3, 0.7);
         moveAction.TimingMode = SKActionTimingMode.EaseOut;
-        scoreLabel.RunAction(SKAction.Sequence(moveAction, SKAction.RemoveFromParent()));
+        scoreLabel.RunAction(SKAction.Sequence(
+            moveAction,
+            SKAction.RemoveFromParent()));
     }
 
     /// <summary>
@@ -513,10 +580,13 @@ public class GameScene : SKScene
         {
             foreach (Gem gem in gems)
             {
-                CGPoint newPosition = GetPositionFromRowAndColumn(gem.Row, gem.Column);
-                SKSpriteNode sprite = gem.Sprite;
+                CGPoint newPosition = GetPositionFromRowAndColumn(
+                    gem.Row,
+                    gem.Column);
+                SKSpriteNode sprite = gem.Sprite
+                    ?? throw new Exception("Sprite is null");
 
-                SKAction action = SKAction.MoveTo(newPosition, Properties.FallAnimationDuration / 1000f);
+                var action = SKAction.MoveTo(newPosition, Properties.FALL_ANIMATION_DURATION / 1000f);
                 action.TimingMode = SKActionTimingMode.EaseOut;
 
                 sprite.RunAction(action);
@@ -531,13 +601,14 @@ public class GameScene : SKScene
     private void ShowSelectionIndicator(Gem gem)
     {
         // Открепляем спрайт от родителя, если он есть
-        if (_selectedSprite.Parent != null)
+        if (_selectedSprite.Parent is not null)
         {
             _selectedSprite.RemoveFromParent();
         }
 
-        SKSpriteNode sprite = gem.Sprite;
-        SKTexture texture = SKTexture.FromImageNamed(gem.GetSelectedSpriteName());
+        SKSpriteNode sprite = gem.Sprite
+            ?? throw new Exception("Sprite is null");
+        var texture = SKTexture.FromImageNamed(gem.GetSelectedSpriteName());
 
         _selectedSprite.Size = new CGSize(_gemCellWidth, _gemCellHeight);
         _selectedSprite.RunAction(SKAction.SetTexture(texture));
@@ -552,10 +623,10 @@ public class GameScene : SKScene
     /// </summary>
     private void HideSelectionIndicator()
     {
-        // открепляем спрайт "подсветки" 
+        // открепляем спрайт "подсветки"
         _selectedSprite.RunAction(
             SKAction.Sequence(
-                SKAction.FadeOutWithDuration(Properties.SelectedGemTextureFadeDuration / 1000f),
+                SKAction.FadeOutWithDuration(Properties.SELECTED_GEM_TEXTURE_FADE_DURATION / 1000f),
                 SKAction.RemoveFromParent()));
     }
 }

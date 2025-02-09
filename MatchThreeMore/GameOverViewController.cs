@@ -30,21 +30,26 @@ public partial class GameOverViewController(IntPtr handle) : UIViewController(ha
 
     private NSUrl GetScoreAnnouncerNsUrl()
     {
-        switch (int.Parse(ScoreLabel.Text))
+        if (ScoreLabel.Text is null)
         {
-            case >= 3500:
-                return NSUrl.FromFilename("greatScoreRus.wav");
-            case >= 2000 and < 3500:
-                return NSUrl.FromFilename("loserScoreRus.wav");
-            case >= 500 and < 2000:
-                return NSUrl.FromFilename("antScoreRus.wav");
-            default:
-                return NSUrl.FromFilename("veryLowScoreRus.wav");
+            return NSUrl.FromFilename("veryLowScoreRus.wav");
         }
+
+        return int.Parse(ScoreLabel.Text) switch
+        {
+            >= 3500 => NSUrl.FromFilename("greatScoreRus.wav"),
+            >= 2000 and < 3500 => NSUrl.FromFilename("loserScoreRus.wav"),
+            >= 500 and < 2000 => NSUrl.FromFilename("antScoreRus.wav"),
+            _ => NSUrl.FromFilename("veryLowScoreRus.wav"),
+        };
     }
 
     private void AddStartButton()
     {
+        ArgumentNullException.ThrowIfNull(View);
+        ArgumentNullException.ThrowIfNull(Storyboard);
+        ArgumentNullException.ThrowIfNull(NavigationController);
+
         UIButton startButton = new()
         {
             Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
@@ -64,15 +69,17 @@ public partial class GameOverViewController(IntPtr handle) : UIViewController(ha
 
     private void AddScore()
     {
+        ArgumentNullException.ThrowIfNull(View);
+
         UILabel scoreTitle = new()
         {
             Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
             Font = CommonFont,
             TextAlignment = UITextAlignment.Center,
-            TextColor = UIColor.White
+            TextColor = UIColor.White,
+            Text = "Ваш счёт:"
         };
 
-        scoreTitle.Text = "Ваш счёт:";
         View.Add(scoreTitle);
 
         ScoreLabel.Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
@@ -85,23 +92,32 @@ public partial class GameOverViewController(IntPtr handle) : UIViewController(ha
 
     private void AddGameOverLabel()
     {
+        ArgumentNullException.ThrowIfNull(View);
+
         UILabel gameOverLabel = new()
         {
             Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
             Font = CommonFont,
             TextAlignment = UITextAlignment.Center,
-            TextColor = UIColor.White
+            TextColor = UIColor.White,
+            Text = "Игра окончена!"
         };
 
-        gameOverLabel.Text = "Игра окончена!";
         View.Add(gameOverLabel);
     }
 
     private void AddBackground()
     {
+        var sourceImage = UIImage.FromFile("background.jpg");
+
+        ArgumentNullException.ThrowIfNull(sourceImage);
+        ArgumentNullException.ThrowIfNull(View);
+
         UIImageView background = new(
             ResizeUIImage(
-                UIImage.FromFile("background.jpg"), (float)View.Bounds.Size.Width, (float)View.Bounds.Size.Height));
+                sourceImage,
+                (float)View.Bounds.Size.Width,
+                (float)View.Bounds.Size.Height));
 
         View.Add(background);
     }

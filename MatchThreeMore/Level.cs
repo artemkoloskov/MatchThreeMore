@@ -5,36 +5,18 @@
 /// </summary>
 public class Level
 {
-    public Gem[,] GemArray
-    {
-        get; set;
-    }
+    public Gem?[,] GemArray { get; set; } = new Gem[Properties.LEVEL_ROWS, Properties.LEVEL_COLUMNS];
     public GemList BonusesToAnimate { get; set; } = [];
     public GemList BonusesToAddSpritesTo { get; set; } = [];
     public GemList GemList => new(GemArray);
     public List<GemList> DestroyedChains { get; set; } = [];
     public List<Swap> Swaps { get; set; } = [];
-    public int Score
-    {
-        get; set;
-    }
+    public int Score { get; set; }
 
-    public int RowsNumber
-    {
-        get;
-    }
-    public int ColumnsNumber
-    {
-        get;
-    }
-    public bool DevModeIsOn
-    {
-        get;
-    }
-    public LevelData LevelData
-    {
-        get;
-    }
+    public int RowsNumber { get; }
+    public int ColumnsNumber { get; }
+    public bool DevModeIsOn { get; }
+    public LevelData? LevelData { get; }
 
     /// <summary>
     /// Конструктор класса <see cref="T:MatchThreeMore.Level"/>.
@@ -50,14 +32,14 @@ public class Level
             LevelData = LevelData.LoadFrom("Dev_Level_1.json");
 
             // Запоминаем размеры уровня для анимации и интеракции
-            RowsNumber = (int)Math.Sqrt(LevelData.level.Length);
+            RowsNumber = (int)Math.Sqrt(LevelData.Level.Length);
             ColumnsNumber = RowsNumber;
         }
         else
         {
             // размеры уровня берем из файла со свойствами
-            RowsNumber = Properties.LevelRows;
-            ColumnsNumber = Properties.LevelColumns;
+            RowsNumber = Properties.LEVEL_ROWS;
+            ColumnsNumber = Properties.LEVEL_COLUMNS;
         }
     }
 
@@ -71,18 +53,34 @@ public class Level
         // Если включен режим разработчика - заполняем поле из level data
         if (DevModeIsOn)
         {
+            if (LevelData is null)
+            {
+                throw new Exception("Не удалось загрузить уровень");
+            }
+
             for (int row = 0; row < RowsNumber; row++)
             {
                 for (int column = 0; column < ColumnsNumber; column++)
                 {
-                    (GemType gemType, bool isALineDestroyer, bool isHorisontal, bool isABomb) = LevelData.GetGemTypeFromLevelDataAt(row, column);
+                    (GemType gemType, bool isALineDestroyer, bool isHorisontal, bool isABomb) =
+                        LevelData.GetGemTypeFromLevelDataAt(row, column);
+
                     if (isABomb)
                     {
-                        GemArray[row, column] = new Gem(isABomb, gemType, row, column);
+                        GemArray[row, column] = new Gem(
+                            isABomb,
+                            gemType,
+                            row,
+                            column);
                     }
                     else
                     {
-                        GemArray[row, column] = new Gem(isALineDestroyer, isHorisontal, gemType, row, column);
+                        GemArray[row, column] = new Gem(
+                            isALineDestroyer,
+                            isHorisontal,
+                            gemType,
+                            row,
+                            column);
                     }
                 }
             }
@@ -99,18 +97,18 @@ public class Level
         {
             for (int column = 0; column < ColumnsNumber; column++)
             {
-                GemType newGemType = (GemType)rnd.Next(Enum.GetNames(typeof(GemType)).Length);
+                var newGemType = (GemType)rnd.Next(Enum.GetNames<GemType>().Length);
 
                 // Проверка на то, чтобы цепочки одинаковых камешков не появились при построении уровня
                 // Массив проверяем только назад, т.к. впереди массив еще не заполнен
-                while (column >= 2 &&
-                        GemArray[row, column - 1].GemType == newGemType &&
-                        GemArray[row, column - 2].GemType == newGemType ||
-                       row >= 2 &&
-                        GemArray[row - 1, column].GemType == newGemType &&
-                        GemArray[row - 2, column].GemType == newGemType)
+                while (column >= 2
+                        && GemArray[row, column - 1]?.GemType == newGemType
+                        && GemArray[row, column - 2]?.GemType == newGemType
+                    || row >= 2
+                        && GemArray[row - 1, column]?.GemType == newGemType
+                        && GemArray[row - 2, column]?.GemType == newGemType)
                 {
-                    newGemType = (GemType)rnd.Next(Enum.GetNames(typeof(GemType)).Length);
+                    newGemType = (GemType)rnd.Next(Enum.GetNames<GemType>().Length);
                 }
 
                 GemArray[row, column] = new Gem(newGemType, row, column);
@@ -136,24 +134,26 @@ public class Level
             for (int column = 0; column < ColumnsNumber; column++)
             {
                 // Запоминаем камешек в текущей  позиции
-                Gem gem = GemArray[row, column];
+                Gem? gem = GemArray[row, column];
 
-                if (gem != null)
+                if (gem is not null)
                 {
                     // Проверка обмена вправо
                     // Последний ряд не сканируем
                     if (column < ColumnsNumber - 1)
                     {
                         // Запоминаем камешек в следующем столбце
-                        Gem otherGem = GemArray[row, column + 1];
-                        if (otherGem != null)
+                        Gem? otherGem = GemArray[row, column + 1];
+
+                        if (otherGem is not null)
                         {
                             // Меняем местами камешки в массиве
                             GemArray[row, column] = otherGem;
                             GemArray[row, column + 1] = gem;
 
                             // Если получилась цепь - запоминаем свопы в одну и в другую сторону
-                            if (GetChainAt(row, column).Count >= 3 || GetChainAt(row, column + 1).Count >= 3)
+                            if (GetChainAt(row, column).Count >= 3
+                                || GetChainAt(row, column + 1).Count >= 3)
                             {
                                 Swaps.Add(new Swap(gem, otherGem));
                                 Swaps.Add(new Swap(otherGem, gem));
@@ -168,9 +168,9 @@ public class Level
                     // Проверка обмена вверх, принцип тот же
                     if (row < RowsNumber - 1)
                     {
-                        Gem otherGem = GemArray[row + 1, column];
+                        Gem? otherGem = GemArray[row + 1, column];
 
-                        if (otherGem != null)
+                        if (otherGem is not null)
                         {
                             GemArray[row, column] = otherGem;
                             GemArray[row + 1, column] = gem;
@@ -186,7 +186,6 @@ public class Level
                         }
                     }
                 }
-
             }
         }
 
@@ -219,18 +218,30 @@ public class Level
 
         GemList chain = GetChainAt(rowB, columnB);
 
+        Gem gemAA = GemArray[rowA, columnA] ?? throw new Exception("Камешка нет в массиве");
+        Gem gemBB = GemArray[rowB, columnB] ?? throw new Exception("Камешка нет в массиве");
         // проверяем получившуюся цепочку на длину. если цепочка больше трех на
         // месте перемещенного камешка ставим бонус
         // записываем бонус в список на добавление спрайтов для сцены
         if (chain.Count == 4)
         {
             bool isHorizontal = chain.ToArray()[0].Row == chain.ToArray()[1].Row;
-            BonusesToAddSpritesTo.Add(new Gem(true, isHorizontal, GemArray[rowB, columnB].GemType, rowB, columnB));
+
+            BonusesToAddSpritesTo.Add(new Gem(
+                isALineDestroyer: true,
+                isHorizontal,
+                gemBB.GemType,
+                rowB,
+                columnB));
         }
 
         if (chain.Count >= 5)
         {
-            BonusesToAddSpritesTo.Add(new Gem(true, GemArray[rowB, columnB].GemType, rowB, columnB));
+            BonusesToAddSpritesTo.Add(new Gem(
+                isABomb: true,
+                gemBB.GemType,
+                rowB,
+                columnB));
         }
 
         chain = GetChainAt(rowA, columnA);
@@ -238,12 +249,21 @@ public class Level
         if (chain.Count == 4)
         {
             bool isHorizontal = chain.ToArray()[0].Row == chain.ToArray()[1].Row;
-            BonusesToAddSpritesTo.Add(new Gem(true, isHorizontal, GemArray[rowA, columnA].GemType, rowA, columnA));
+            BonusesToAddSpritesTo.Add(new Gem(
+                isALineDestroyer: true,
+                isHorizontal,
+                gemAA.GemType,
+                rowA,
+                columnA));
         }
 
         if (chain.Count >= 5)
         {
-            BonusesToAddSpritesTo.Add(new Gem(true, GemArray[rowA, columnA].GemType, rowA, columnA));
+            BonusesToAddSpritesTo.Add(new Gem(
+                isABomb: true,
+                gemAA.GemType,
+                rowA,
+                columnA));
         }
     }
 
@@ -255,28 +275,37 @@ public class Level
     private void PrintOutGemArrayToConsole(bool withFullGemDescriptions)
     {
         Console.Write("Новое состояние\n\n");
+
         for (int row = RowsNumber - 1; row >= 0; row--)
         {
             for (int column = 0; column < ColumnsNumber; column++)
             {
-                if (GemArray[row, column] != null)
-                {
-                    if (withFullGemDescriptions)
-                        Console.Write(GemArray[row, column] + " ");
-                    else
-                    {
-                        if (GemArray[row, column].IsALineDestroyer)
-                            Console.Write(GemArray[row, column].GemType.ToString().Substring(0, 1).ToUpper() + " ");
-                        else
-                            Console.Write(GemArray[row, column].GemType.ToString().Substring(0, 1) + " ");
-                    }
+                Gem? gem = GemArray[row, column];
 
+                if (gem is null)
+                {
+                    Console.Write("_ ");
+
+                    continue;
+                }
+
+                if (withFullGemDescriptions)
+                {
+                    Console.Write(gem + " ");
+
+                    continue;
+                }
+
+                if (gem.IsALineDestroyer)
+                {
+                    Console.Write(gem.GemType.ToString()[..1].ToUpper() + " ");
                 }
                 else
                 {
-                    Console.Write("_ ");
+                    Console.Write(gem.GemType.ToString()[..1] + " ");
                 }
             }
+
             Console.Write("\n");
         }
     }
@@ -292,26 +321,30 @@ public class Level
     private GemList GetChainAt(int gemRow, int gemColumn)
     {
         GemList possibleHorizontalChain = [];
+        Gem? gem = GemArray[gemRow, gemColumn];
 
         // Если камешка в данной позиции вообще нет - возвращаем пустой список
-        if (GemArray[gemRow, gemColumn] == null)
+        if (gem is null)
         {
             return possibleHorizontalChain;
         }
 
-        possibleHorizontalChain.Add(GemArray[gemRow, gemColumn]);
+        possibleHorizontalChain.Add(gem);
 
-        GemType gemTypeToCheck = GemArray[gemRow, gemColumn].GemType;
+        GemType gemTypeToCheck = gem.GemType;
 
         // Флаг разрыва цепочки
         bool chainIsNotBroken = true;
 
         //Проверка влево
-        for (int column = gemColumn - 1; column >= 0 && chainIsNotBroken; column--)
+        for (int column = gemColumn - 1; column >= 0
+            && chainIsNotBroken; column--)
         {
-            if (GemArray[gemRow, column] != null && gemTypeToCheck == GemArray[gemRow, column].GemType)
+            Gem? gemToCheck = GemArray[gemRow, column];
+
+            if (gemToCheck is not null && gemTypeToCheck == gemToCheck.GemType)
             {
-                possibleHorizontalChain.Add(GemArray[gemRow, column]);
+                possibleHorizontalChain.Add(gemToCheck);
             }
             else
             {
@@ -322,11 +355,14 @@ public class Level
         chainIsNotBroken = true;
 
         // Проверка вправо
-        for (int column = gemColumn + 1; column < ColumnsNumber && chainIsNotBroken; column++)
+        for (int column = gemColumn + 1; column < ColumnsNumber
+            && chainIsNotBroken; column++)
         {
-            if (GemArray[gemRow, column] != null && gemTypeToCheck == GemArray[gemRow, column].GemType)
+            Gem? gemToCheck = GemArray[gemRow, column];
+
+            if (gemToCheck is not null && gemTypeToCheck == gemToCheck.GemType)
             {
-                possibleHorizontalChain.Add(GemArray[gemRow, column]);
+                possibleHorizontalChain.Add(gemToCheck);
             }
             else
             {
@@ -339,12 +375,14 @@ public class Level
 
         chainIsNotBroken = true;
 
-        // Проверка вниз 
+        // Проверка вниз
         for (int row = gemRow - 1; row >= 0 && chainIsNotBroken; row--)
         {
-            if (GemArray[row, gemColumn] != null && gemTypeToCheck == GemArray[row, gemColumn].GemType)
+            Gem? gemToCheck = GemArray[row, gemColumn];
+
+            if (gemToCheck is not null && gemTypeToCheck == gemToCheck.GemType)
             {
-                possibleVerticalChain.Add(GemArray[row, gemColumn]);
+                possibleVerticalChain.Add(gemToCheck);
             }
             else
             {
@@ -357,9 +395,11 @@ public class Level
         // Проверка вверх
         for (int row = gemRow + 1; row < RowsNumber && chainIsNotBroken; row++)
         {
-            if (GemArray[row, gemColumn] != null && gemTypeToCheck == GemArray[row, gemColumn].GemType)
+            Gem? gemToCheck = GemArray[row, gemColumn];
+
+            if (gemToCheck is not null && gemTypeToCheck == gemToCheck.GemType)
             {
-                possibleVerticalChain.Add(GemArray[row, gemColumn]);
+                possibleVerticalChain.Add(gemToCheck);
             }
             else
             {
@@ -384,14 +424,14 @@ public class Level
     /// Сканирование на наличие цепочки
     /// </summary>
     /// <returns><c>true</c>, если цепочка найдена, <c>false</c> если не найдена.</returns>
-    public GemList RetrieveChain()
+    public GemList? RetrieveChain()
     {
         for (int row = 0; row < RowsNumber; row++)
         {
             for (int column = 0; column < ColumnsNumber; column++)
             {
                 GemList chain = GetChainAt(row, column);
-                if (chain != null && chain.Count >= 3)
+                if (chain is not null && chain.Count >= 3)
                 {
                     return chain;
                 }
@@ -411,7 +451,7 @@ public class Level
             {
                 GemList chain = GetChainAt(row, column);
 
-                if (chain != null && chain.Count >= 3 && !chains.Contains(chain))
+                if (chain is not null && chain.Count >= 3 && !chains.Contains(chain))
                 {
                     chains.Add(chain);
                 }
@@ -422,8 +462,8 @@ public class Level
     }
 
     /// <summary>
-    /// Уничтожение цепей в массиве камешков: 
-    /// метод сканирует массив на цепочки до тех пор, пока они есть, 
+    /// Уничтожение цепей в массиве камешков:
+    /// метод сканирует массив на цепочки до тех пор, пока они есть,
     /// найдя цепочку заносит ее в список удаляемых цепочек, после чего
     /// уничтожает соответствующие камешки в массиве. Так же проверяет цепочки
     /// в них бонусов, заполняет список с бонусами.
@@ -431,10 +471,10 @@ public class Level
     /// <returns><c>true</c> если нашелся хотя бы один активируемый бонус</returns>
     public void DestroyChains()
     {
-        GemList chain = RetrieveChain();
+        GemList? chain = RetrieveChain();
 
         // Повторяем процесс пока находим цепочку на уровне
-        while (chain != null)
+        while (chain is not null)
         {
             GemList bonuses;
             bool needToReiterate = true;
@@ -453,7 +493,7 @@ public class Level
                         BonusesToAnimate.Add(bonus);
                     }
 
-                    // Заносим в цепочку весь ряд или столбец, 
+                    // Заносим в цепочку весь ряд или столбец,
                     // в зависимости от направленности разрушителя
                     if (bonus.IsALineDestroyer)
                     {
@@ -461,9 +501,11 @@ public class Level
                         {
                             for (int column = 0; column < ColumnsNumber; column++)
                             {
-                                if (GemArray[bonus.Row, column] != null && !chain.Contains(GemArray[bonus.Row, column]))
+                                Gem? gem = GemArray[bonus.Row, column];
+
+                                if (gem is not null && !chain.Contains(gem))
                                 {
-                                    chain.Add(GemArray[bonus.Row, column]);
+                                    chain.Add(gem);
                                 }
                             }
                         }
@@ -471,9 +513,11 @@ public class Level
                         {
                             for (int row = 0; row < RowsNumber; row++)
                             {
-                                if (GemArray[row, bonus.Column] != null && !chain.Contains(GemArray[row, bonus.Column]))
+                                Gem? gem = GemArray[row, bonus.Column];
+
+                                if (gem is not null && !chain.Contains(gem))
                                 {
-                                    chain.Add(GemArray[row, bonus.Column]);
+                                    chain.Add(gem);
                                 }
                             }
                         }
@@ -483,44 +527,48 @@ public class Level
                     {
                         int i;
                         int j;
+
                         if (bonus.Row == 0)
                         {
                             i = 0;
                         }
                         else
                         {
-                            if (bonus.Row - Properties.BombBlastRadius < 0)
+                            if (bonus.Row - Properties.BOMB_BLAST_RADIUS < 0)
                             {
                                 i = 0;
                             }
                             else
                             {
-                                i = bonus.Row - Properties.BombBlastRadius;
+                                i = bonus.Row - Properties.BOMB_BLAST_RADIUS;
                             }
                         }
+
                         if (bonus.Column == 0)
                         {
                             j = 0;
                         }
                         else
                         {
-                            if (bonus.Column - Properties.BombBlastRadius < 0)
+                            if (bonus.Column - Properties.BOMB_BLAST_RADIUS < 0)
                             {
                                 j = 0;
                             }
                             else
                             {
-                                j = bonus.Column - Properties.BombBlastRadius;
+                                j = bonus.Column - Properties.BOMB_BLAST_RADIUS;
                             }
                         }
 
-                        for (int row = i; row <= bonus.Row + Properties.BombBlastRadius && row <= RowsNumber - 1; row++)
+                        for (int row = i; row <= bonus.Row + Properties.BOMB_BLAST_RADIUS && row <= RowsNumber - 1; row++)
                         {
-                            for (int column = j; column <= bonus.Column + Properties.BombBlastRadius && column <= ColumnsNumber - 1; column++)
+                            for (int column = j; column <= bonus.Column + Properties.BOMB_BLAST_RADIUS && column <= ColumnsNumber - 1; column++)
                             {
-                                if (GemArray[row, column] != null && !chain.Contains(GemArray[row, column]))
+                                Gem? gem = GemArray[row, column];
+
+                                if (gem is not null && !chain.Contains(gem))
                                 {
-                                    chain.Add(GemArray[row, column]);
+                                    chain.Add(gem);
                                 }
                             }
                         }
@@ -561,24 +609,34 @@ public class Level
         {
             for (int column = 0; column < ColumnsNumber; column++)
             {
-                if (GemArray[row, column] == null)
+                if (GemArray[row, column] is not null)
                 {
-                    bool foundAppropriateGemType = false;
-
-                    // Создаем камешек, записываем его в массив, проверяем не создал ли он цепочку
-                    // если создал - повторяем до те пор, пока не найдем камешек, который не создаст цепочку
-                    while (!foundAppropriateGemType)
-                    {
-                        GemType newGemType = (GemType)rnd.Next(Enum.GetNames(typeof(GemType)).Length);
-
-                        GemArray[row, column] = new Gem(newGemType, row, column);
-
-                        foundAppropriateGemType = GetChainAt(row, column).Count < 3;
-                    }
-
-                    // Добавляем новый камешек в список камешков, которым позже добавят спрайты
-                    newGems.Add(GemArray[row, column]);
+                    continue;
                 }
+
+                bool foundAppropriateGemType = false;
+
+                // Создаем камешек, записываем его в массив, проверяем не создал ли он цепочку
+                // если создал - повторяем до те пор, пока не найдем камешек, который не создаст цепочку
+                Gem? gem = null;
+
+                while (!foundAppropriateGemType)
+                {
+                    var newGemType = (GemType)rnd.Next(Enum.GetNames<GemType>().Length);
+
+                    gem = new Gem(newGemType, row, column);
+                    GemArray[row, column] = gem;
+
+                    foundAppropriateGemType = GetChainAt(row, column).Count < 3;
+                }
+
+                // Добавляем новый камешек в список камешков, которым позже добавят спрайты
+                if (gem is null)
+                {
+                    throw new Exception("Камешек не создан");
+                }
+
+                newGems.Add(gem);
             }
         }
 
@@ -590,11 +648,11 @@ public class Level
 
     /// <summary>
     /// Падение камешков на пустые места. Сканирует колонку на пустоту,
-    /// найдя пустоту сканирует снова, на наличие камешка сверху. При наличии - 
+    /// найдя пустоту сканирует снова, на наличие камешка сверху. При наличии -
     /// "роняет" его на пустое место. Упавшие камешки заносятся в колонки,
     /// Колонки заносятся в список на обновление спрайтов
     /// </summary>
-    /// <returns>Список колонок камешков, которые переместились, 
+    /// <returns>Список колонок камешков, которые переместились,
     /// для обновления позиции спрайтов</returns>
     public List<GemList> DropGems()
     {
@@ -608,30 +666,35 @@ public class Level
             for (int row = 0; row < RowsNumber; row++)
             {
                 // Если текущая ячейка пустая - сканируем текущий столбец вверх
-                if (GemArray[row, column] == null)
+                if (GemArray[row, column] is not null)
                 {
-                    bool foundNewGemAbove = false;
+                    continue;
+                }
 
-                    for (int aboveRow = row + 1; aboveRow < RowsNumber && !foundNewGemAbove; aboveRow++)
+                bool foundNewGemAbove = false;
+
+                for (int aboveRow = row + 1; aboveRow < RowsNumber && !foundNewGemAbove; aboveRow++)
+                {
+                    // находим непустую ячейку и переносим камешек оттуда в текущую ячейку
+                    if (GemArray[aboveRow, column] is null)
                     {
-                        // находим непустую ячейку и переносим камешек оттуда в текущую ячейку
-                        if (GemArray[aboveRow, column] != null)
-                        {
-                            GemArray[row, column] = GemArray[aboveRow, column];
-                            // ячейку из которой спустили камешек зануляем
-#pragma warning disable CS8625 // Cannot convert null literal to non-nullable reference type.
-                            GemArray[aboveRow, column] = null;
-#pragma warning restore CS8625 // Cannot convert null literal to non-nullable reference type.
-                              // Обновляем координату ряда у камешка
-                            GemArray[row, column].Row = row;
-
-                            //запоминаем камешек для анимации спрайтов
-                            columnOfFallenGems.Add(GemArray[row, column]);
-
-                            foundNewGemAbove = true;
-                        }
+                        continue;
                     }
 
+                    GemArray[row, column] = GemArray[aboveRow, column];
+
+                    // ячейку из которой спустили камешек зануляем
+                    GemArray[aboveRow, column] = null;
+                    // Обновляем координату ряда у камешка
+                    Gem? gem = GemArray[row, column]
+                        ?? throw new Exception("Камешек не найден");
+
+                    gem.Row = row;
+
+                    //запоминаем камешек для анимации спрайтов
+                    columnOfFallenGems.Add(gem);
+
+                    foundNewGemAbove = true;
                 }
             }
 
