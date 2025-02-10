@@ -59,7 +59,7 @@ public partial class GameViewController : UIViewController
         _scene = SKNode.FromFile<GameScene>("GameScene")
             ?? throw new Exception("GameScene not found");
         _scene.ScaleMode = SKSceneScaleMode.AspectFill;
-sssx
+
         // Передаем сцене данные о размере вью
         _scene.SetSize(skView.Bounds.Size);
 
