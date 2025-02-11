@@ -9,13 +9,12 @@ using System;
 using System.CodeDom.Compiler;
 using UIKit;
 
-namespace MatchThreeMore
+namespace MatchThreeMore;
+
+[Register ("MainMenuViewController")]
+partial class MainMenuViewController
 {
-    [Register ("MainMenuViewController")]
-    partial class MainMenuViewController
+    void ReleaseDesignerOutlets ()
     {
-        void ReleaseDesignerOutlets ()
-        {
-        }
     }
 }

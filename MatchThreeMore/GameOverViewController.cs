@@ -1,117 +1,124 @@
 using AudioToolbox;
-using Foundation;
-using System;
-using UIKit;
 
 using static MatchThreeMore.AdditionalMethods;
 using static MatchThreeMore.Properties;
 
-namespace MatchThreeMore
+namespace MatchThreeMore;
+
+public partial class GameOverViewController(IntPtr handle) : UIViewController(handle)
 {
-    public partial class GameOverViewController : UIViewController
+    public UILabel ScoreLabel = [];
+
+    public override void ViewDidLoad()
     {
-        public GameOverViewController(IntPtr handle) : base(handle)
+        base.ViewDidLoad();
+
+        AddBackground();
+        AddGameOverLabel();
+        AddScore();
+        AddStartButton();
+        AnnounceScore();
+    }
+
+    private void AnnounceScore()
+    {
+        NSUrl nsUrl = GetScoreAnnouncerNsUrl();
+
+        SystemSound ss = new(nsUrl);
+        ss.PlayAlertSound();
+    }
+
+    private NSUrl GetScoreAnnouncerNsUrl()
+    {
+        if (ScoreLabel.Text is null)
         {
+            return NSUrl.FromFilename("veryLowScoreRus.wav");
         }
 
-        public UILabel ScoreLabel = new UILabel();
-
-        public override void ViewDidLoad()
+        return int.Parse(ScoreLabel.Text) switch
         {
-            base.ViewDidLoad();
+            >= 3500 => NSUrl.FromFilename("greatScoreRus.wav"),
+            >= 2000 and < 3500 => NSUrl.FromFilename("loserScoreRus.wav"),
+            >= 500 and < 2000 => NSUrl.FromFilename("antScoreRus.wav"),
+            _ => NSUrl.FromFilename("veryLowScoreRus.wav"),
+        };
+    }
 
-            AddBackground();
-            AddGameOverLabel();
-            AddScore();
-            AddStartButton();
-            AnnounceScore();
-        }
+    private void AddStartButton()
+    {
+        ArgumentNullException.ThrowIfNull(View);
+        ArgumentNullException.ThrowIfNull(Storyboard);
+        ArgumentNullException.ThrowIfNull(NavigationController);
 
-        private void AnnounceScore()
+        UIButton startButton = new()
         {
-            NSUrl nsUrl = GetScoreAnnouncerNsUrl();
+            Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
+            BackgroundColor = ButtonColor
+        };
 
-            SystemSound ss = new SystemSound(nsUrl);
-            ss.PlayAlertSound();
-        }
+        startButton.SetTitle("В МЕНЮ", UIControlState.Normal);
 
-        private NSUrl GetScoreAnnouncerNsUrl()
+        View.Add(startButton);
+
+        startButton.TouchUpInside += (sender, e) =>
         {
-            switch (int.Parse(ScoreLabel.Text))
-            {
-                case >= 3500:
-                    return NSUrl.FromFilename("greatScoreRus.wav");
-                case >= 2000 and < 3500:
-                    return NSUrl.FromFilename("loserScoreRus.wav");
-                case >= 500 and < 2000:
-                    return NSUrl.FromFilename("antScoreRus.wav");
-                default:
-                    return NSUrl.FromFilename("veryLowScoreRus.wav");
-            }
-        }
+            UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
+            NavigationController.PushViewController(mainMenu, true);
+        };
+    }
 
-        private void AddStartButton()
+    private void AddScore()
+    {
+        ArgumentNullException.ThrowIfNull(View);
+
+        UILabel scoreTitle = new()
         {
-            UIButton startButton = new UIButton
-            {
-                Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, View.Bounds.Size.Height - 100, 150, 50),
-                Font = CommonFont,
-                BackgroundColor = ButtonColor
-            };
+            Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
+            Font = CommonFont,
+            TextAlignment = UITextAlignment.Center,
+            TextColor = UIColor.White,
+            Text = "Ваш счёт:"
+        };
 
-            startButton.SetTitle("В МЕНЮ", UIControlState.Normal);
+        View.Add(scoreTitle);
 
-            View.Add(startButton);
+        ScoreLabel.Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
+        ScoreLabel.TextAlignment = UITextAlignment.Center;
+        ScoreLabel.Font = UIFont.FromName("GillSans-BoldItalic", 18f);
+        ScoreLabel.TextColor = UIColor.White;
 
-            startButton.TouchUpInside += (sender, e) =>
-            {
-                UIViewController mainMenu = Storyboard.InstantiateViewController("MainMenu");
-                NavigationController.PushViewController(mainMenu, true);
-            };
-        }
+        View.Add(ScoreLabel);
+    }
 
-        private void AddScore()
+    private void AddGameOverLabel()
+    {
+        ArgumentNullException.ThrowIfNull(View);
+
+        UILabel gameOverLabel = new()
         {
-            UILabel scoreTitle = new UILabel
-            {
-                Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 170, 150, 50),
-                Font = CommonFont,
-                TextAlignment = UITextAlignment.Center,
-                TextColor = UIColor.White
-            };
+            Frame = new CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
+            Font = CommonFont,
+            TextAlignment = UITextAlignment.Center,
+            TextColor = UIColor.White,
+            Text = "Игра окончена!"
+        };
 
-            scoreTitle.Text = "Ваш счёт:";
-            View.Add(scoreTitle);
+        View.Add(gameOverLabel);
+    }
 
-            ScoreLabel.Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 185, 150, 50);
-            ScoreLabel.TextAlignment = UITextAlignment.Center;
-            ScoreLabel.Font = UIFont.FromName("GillSans-BoldItalic", 18f);
-            ScoreLabel.TextColor = UIColor.White;
+    private void AddBackground()
+    {
+        var sourceImage = UIImage.FromFile("background.jpg");
 
-            View.Add(ScoreLabel);
-        }
+        ArgumentNullException.ThrowIfNull(sourceImage);
+        ArgumentNullException.ThrowIfNull(View);
 
-        private void AddGameOverLabel()
-        {
-            UILabel gameOverLabel = new UILabel
-            {
-                Frame = new CoreGraphics.CGRect(View.Bounds.Size.Width / 2 - 75, 150, 150, 50),
-                Font = CommonFont,
-                TextAlignment = UITextAlignment.Center,
-                TextColor = UIColor.White
-            };
+        UIImageView background = new(
+            ResizeUIImage(
+                sourceImage,
+                (float)View.Bounds.Size.Width,
+                (float)View.Bounds.Size.Height));
 
-            gameOverLabel.Text = "Игра окончена!";
-            View.Add(gameOverLabel);
-        }
-
-        private void AddBackground()
-        {
-            UIImageView background = new UIImageView(
-                ResizeUIImage(
-                    UIImage.FromFile("background.jpg"), (float)View.Bounds.Size.Width, (float)View.Bounds.Size.Height));
-
-            View.Add(background);
-        }
+        View.Add(background);
     }
 }

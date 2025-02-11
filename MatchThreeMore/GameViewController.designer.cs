@@ -8,13 +8,12 @@ using Foundation;
 using System;
 using System.CodeDom.Compiler;
 
-namespace MatchThreeMore
+namespace MatchThreeMore;
+
+[Register ("GameViewController")]
+partial class GameViewController
 {
-    [Register ("GameViewController")]
-    partial class GameViewController
+    void ReleaseDesignerOutlets ()
     {
-        void ReleaseDesignerOutlets ()
-        {
-        }
     }
 }

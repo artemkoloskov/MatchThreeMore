@@ -1,89 +1,46 @@
-﻿using System.IO;
+﻿using Newtonsoft.Json;
 
-namespace MatchThreeMore
+namespace MatchThreeMore;
+
+public class LevelData
 {
-    public class LevelData
+    public string[,] Level { get; set; } = new string[9, 9];
+
+    public static LevelData LoadFrom (string fileName)
     {
-        public string[,] level;
-        
-        public static LevelData LoadFrom (string fileName)
+        string data = File.ReadAllText(fileName);
+
+        LevelData? levelData = JsonConvert.DeserializeObject<LevelData>(data)
+            ?? throw new Exception("Не удалось загрузить уровень");
+
+        return levelData;
+    }
+
+    public (GemType, bool, bool, bool) GetGemTypeFromLevelDataAt (int row, int column)
+    {
+        return Level[row, column] switch
         {
-            string data = File.ReadAllText(fileName);
-
-            LevelData levelData = Newtonsoft.Json.JsonConvert.DeserializeObject<LevelData>(data);
-
-            return levelData;
-        }
-
-        public (GemType, bool, bool, bool) GetGemTypeFromLevelDataAt (int row, int column)
-        {
-            switch (level[row, column])
-            {
-                case "T":
-                    // треугольник, вертикальная линия
-                    return (GemType.triangle, true, false, false); 
-                case "S":
-                    // квадрат, вертикальная линия
-                    return (GemType.square, true, false, false);
-                case "D":
-                    // ромб, вертикальная линия
-                    return (GemType.diamond, true, false, false);
-                case "P":
-                    // пентагон, вертикальная линия
-                    return (GemType.pentagon, true, false, false);
-                case "H":
-                    // гексагон, вертикальная линия
-                    return (GemType.hexagon, true, false, false);
-                case "T'":
-                    // треугольник, горизонтальная линия
-                    return (GemType.triangle, true, true, false);
-                case "S'":
-                    // квадрат, горизонтальная линия
-                    return (GemType.square, true, true, false);
-                case "D'":
-                    // ромб, горизонтальная линия
-                    return (GemType.diamond, true, true, false);
-                case "P'":
-                    // пентагон, горизонтальная линия
-                    return (GemType.pentagon, true, true, false);
-                case "H'":
-                    // гексагон, горизонтальная линия
-                    return (GemType.hexagon, true, true, false);
-                case "t":
-                    // треугольник
-                    return (GemType.triangle, false, false, false);
-                case "s":
-                    // квадрат
-                    return (GemType.square, false, false, false);
-                case "d":
-                    // ромб
-                    return (GemType.diamond, false, false, false);
-                case "p":
-                    // пентагон
-                    return (GemType.pentagon, false, false, false);
-                case "h":
-                    // гексагон
-                    return (GemType.hexagon, false, false, false);
-                case "t'":
-                    // треугольник, бомба
-                    return (GemType.triangle, false, false, true);
-                case "s'":
-                    // квадрат, бомба
-                    return (GemType.square, false, false, true);
-                case "d'":
-                    // ромб, бомба
-                    return (GemType.diamond, false, false, true);
-                case "p'":
-                    // пентагон, бомба
-                    return (GemType.pentagon, false, false, true);
-                case "h'":
-                    // гексагон, бомба
-                    return (GemType.hexagon, false, false, true);
-                default:
-                    return (GemType.triangle, false, false, true);
-            }
-
-
-        }
+            "T" => (GemType.triangle, true, false, false),// треугольник, вертикальная линия
+            "S" => (GemType.square, true, false, false),// квадрат, вертикальная линия
+            "D" => (GemType.diamond, true, false, false),// ромб, вертикальная линия
+            "P" => (GemType.pentagon, true, false, false),// пентагон, вертикальная линия
+            "H" => (GemType.hexagon, true, false, false),// гексагон, вертикальная линия
+            "T'" => (GemType.triangle, true, true, false),// треугольник, горизонтальная линия
+            "S'" => (GemType.square, true, true, false),// квадрат, горизонтальная линия
+            "D'" => (GemType.diamond, true, true, false),// ромб, горизонтальная линия
+            "P'" => (GemType.pentagon, true, true, false),// пентагон, горизонтальная линия
+            "H'" => (GemType.hexagon, true, true, false),// гексагон, горизонтальная линия
+            "t" => (GemType.triangle, false, false, false),// треугольник
+            "s" => (GemType.square, false, false, false),// квадрат
+            "d" => (GemType.diamond, false, false, false),// ромб
+            "p" => (GemType.pentagon, false, false, false),// пентагон
+            "h" => (GemType.hexagon, false, false, false),// гексагон
+            "t'" => (GemType.triangle, false, false, true),// треугольник, бомба
+            "s'" => (GemType.square, false, false, true),// квадрат, бомба
+            "d'" => (GemType.diamond, false, false, true),// ромб, бомба
+            "p'" => (GemType.pentagon, false, false, true),// пентагон, бомба
+            "h'" => (GemType.hexagon, false, false, true),// гексагон, бомба
+            _ => (GemType.triangle, false, false, true),
+        };
     }
 }
